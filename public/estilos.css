@@ -124,7 +124,61 @@ summary::after { content: "+"; font: 700 22px/1 var(--titulo); color: var(--tier
 details[open] summary::after { content: "–"; }
 details p { padding: 0 20px 18px; color: var(--piedra); }
 
-/* VentaStore Capitals: una mención, no una portada */
+/* Invertí en Venta Store */
+.invertir { background: var(--selva); color: var(--blanco); padding: 60px 0; }
+.inv-cab h2 { margin-top: 10px; }
+.inv-cab .bajada { max-width: 46em; }
+.tasas { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 30px; max-width: 640px; }
+.tasa, .simulador { background: var(--selva-2); border-radius: 20px; padding: 22px; display: flex; flex-direction: column; gap: 4px; }
+.tasa b { font-family: var(--titulo); font-weight: 800; font-size: 56px; line-height: 1; color: var(--blanco); margin-top: 8px; }
+.tasa > span:not(.etiqueta) { color: var(--claro-sobre-selva); font-weight: 600; }
+.tasa small { color: var(--claro-sobre-selva); margin-top: 10px; }
+.sim-fila-vieja { display: grid; grid-template-columns: 1.4fr 1fr; gap: 10px; margin-top: 8px; }
+.sim-fila label { display: grid; gap: 6px; font-size: 13px; font-weight: 700; color: var(--claro-sobre-selva); }
+.sim-fila input, .sim-fila select { font: 600 17px var(--texto); color: var(--selva); background: var(--blanco); border: 0; border-radius: 12px; min-height: 46px; padding: 0 12px; width: 100%; }
+.sim-res { margin-top: 12px; font-size: 18px; color: var(--blanco); }
+.sim-res b { font-family: var(--titulo); font-size: 26px; }
+.sim-res small { display: block; color: var(--claro-sobre-selva); font-size: 13px; margin-top: 4px; }
+.respaldo { list-style: none; padding: 0; margin: 14px 0 0; display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+.respaldo li { border: 1px solid #2A4339; border-radius: 20px; padding: 18px; }
+.respaldo b { display: block; font-family: var(--titulo); font-size: 18px; }
+.respaldo span { display: block; color: var(--claro-sobre-selva); font-size: 14.5px; margin-top: 6px; }
+.inv-pie { display: flex; align-items: center; gap: 20px; flex-wrap: wrap; margin-top: 26px; }
+.aviso-legal { color: #8FA399; font-size: 13px; max-width: 52em; }
+.sim { display: grid; grid-template-columns: 1fr 1.25fr; gap: 14px; margin-top: 14px; }
+.sim-controles, .sim-resultado { background: var(--selva-2); border-radius: 20px; padding: 24px; display: flex; flex-direction: column; gap: 16px; }
+.sim-controles h3 { font-size: 24px; }
+.campo-sim { display: grid; gap: 8px; }
+.campo-sim > span { font-size: 13px; font-weight: 700; color: var(--claro-sobre-selva); }
+.campo-sim input { font: 700 22px var(--titulo); color: var(--selva); background: var(--blanco); border: 0; border-radius: 14px; min-height: 52px; padding: 0 16px; width: 100%; font-variant-numeric: tabular-nums; }
+.segmento { display: flex; background: var(--selva); border-radius: 14px; padding: 4px; gap: 4px; }
+.segmento button { flex: 1; min-height: 42px; border: 0; border-radius: 11px; background: transparent; color: var(--claro-sobre-selva); font: 600 14.5px var(--texto); cursor: pointer; padding: 0 8px; }
+.segmento button[aria-pressed="true"] { background: var(--blanco); color: var(--selva); }
+.rapidos { display: flex; gap: 8px; flex-wrap: wrap; margin-top: -6px; }
+.rapidos button { border: 1px solid #3B5248; background: transparent; color: var(--blanco); border-radius: 99px; min-height: 34px; padding: 0 12px; font: 600 13.5px var(--texto); cursor: pointer; }
+.rapidos button[aria-pressed="true"] { background: var(--tierra); border-color: var(--tierra); }
+.sim-cifras { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.sim-cifras div { background: var(--selva); border-radius: 14px; padding: 14px; }
+.sim-cifras div.destacada { background: var(--tierra); }
+.sim-cifras span { display: block; font-size: 12.5px; font-weight: 700; color: var(--claro-sobre-selva); }
+.sim-cifras .destacada span { color: #FCE8E1; }
+.sim-cifras b { display: block; font-family: var(--titulo); font-weight: 800; font-size: 22px; margin-top: 6px; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.grafico { height: 170px; display: flex; align-items: flex-end; gap: 4px; padding-bottom: 18px; border-bottom: 1px solid #2A4339; }
+.barra { flex: 1; height: 100%; display: flex; flex-direction: column; justify-content: flex-end; position: relative; }
+.barra i { display: block; width: 100%; }
+.barra .gan { background: var(--tierra); border-radius: 4px 4px 0 0; }
+.barra .cap { background: #3B5248; }
+.barra em { position: absolute; bottom: -18px; left: 50%; transform: translateX(-50%); font-style: normal; font-size: 11px; color: #8FA399; }
+.grafico-ref { display: flex; gap: 16px; font-size: 13px; color: var(--claro-sobre-selva); margin-top: -6px; }
+.grafico-ref i { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 6px; vertical-align: -1px; }
+.ref-cap { background: #3B5248; } .ref-gan { background: var(--tierra); }
+.sim-error { background: #3A1A12; color: #F6B4A0; border-radius: 12px; padding: 10px 12px; font-weight: 600; font-size: 14px; }
+.sim-resultado .btn { align-self: flex-start; }
+@media (max-width: 860px) { .sim { grid-template-columns: 1fr; } .respaldo { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 520px) { .sim-cifras { grid-template-columns: 1fr; } .sim-cifras b { font-size: 24px; } .sim-resultado .btn { align-self: stretch; } .segmento button { font-size: 13px; } }
+@media (max-width: 520px) { .respaldo { grid-template-columns: 1fr; } .tasa b { font-size: 46px; } }
+
+/* (sin uso) mención anterior a Capitals */
 .capitals { padding: 0 0 56px; }
 .capitals-fila { background: var(--selva); color: var(--blanco); border-radius: 20px; padding: 22px 24px; display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; }
 .capitals p { color: var(--claro-sobre-selva); max-width: 44em; }

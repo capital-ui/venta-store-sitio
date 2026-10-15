@@ -112,10 +112,11 @@ const servidor = http.createServer(async (req, res) => {
     }
     // Direcciones del sitio anterior que pueden estar en Google o compartidas
     if (["/catalogo", "/catalog", "/productos"].includes(ruta)) { res.writeHead(301, { Location: "/#catalogo" }); return res.end(); }
-    if (ruta === "/invertir") { res.writeHead(301, { Location: "/#capitals" }); return res.end(); }
+    if (ruta === "/invertir") { res.writeHead(301, { Location: "/#invertir" }); return res.end(); }
     let archivo = path.normalize(path.join(PUB, ruta === "/" ? "index.html" : ruta));
     if (!archivo.startsWith(PUB) || !fs.existsSync(archivo) || fs.statSync(archivo).isDirectory()) archivo = path.join(PUB, "index.html");
-    const ext = path.extname(archivo), largo = ext === ".html" ? "no-cache" : "public, max-age=86400";
+    // HTML, estilos y código se revisan siempre (cambian con cada versión); imágenes, un día.
+    const ext = path.extname(archivo), largo = [".html", ".css", ".js"].includes(ext) ? "no-cache" : "public, max-age=86400";
     res.writeHead(200, { ...CABECERAS, "Content-Type": TIPOS[ext] || "application/octet-stream", "Cache-Control": largo });
     fs.createReadStream(archivo).pipe(res);
   } catch (e) { console.error(e); if (!res.headersSent) res.writeHead(500); res.end("Error"); }

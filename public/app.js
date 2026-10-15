@@ -46,7 +46,7 @@ function tarjeta(p) {
     <div class="info">
       <h3>${esc(p.nombre)}</h3>
       ${p.detalle ? `<p class="detalle">${esc(p.detalle)}</p>` : ""}
-      ${p.conAccesorios ? '<p class="incluye">Llega con funda, vidrio, cargador y AirPods</p>' : ""}
+      ${p.conAccesorios ? '<p class="incluye">Llega con vidrio templado y cable</p>' : ""}
       <p class="precio">${usd(p.usd)}</p>
       ${datos.dolar > 0 ? `<p class="pesos">${pesos(p.usd * datos.dolar)} al dólar de hoy</p>` : ""}
       <p class="cuota-nota">o en cuotas sin tarjeta, en Posadas</p>
@@ -127,4 +127,45 @@ document.addEventListener("keydown", ev => { if (ev.key === "Escape" && $("#pedi
 $("#buscar").addEventListener("input", ev => { texto = ev.target.value; pintar(); });
 ["#pago", "#envio", "#nombre"].forEach(s => $(s).addEventListener("input", actualizarEnlace));
 $("#pago").addEventListener("change", actualizarEnlace);
+
+/* ---------- Simulador de inversión (6 % mensual en pesos, 3 % en dólares) ---------- */
+const TASA = { ARS: 0.06, USD: 0.03 }, MINIMO = { ARS: 3000000, USD: 2000 };
+const RAPIDOS = { ARS: [3000000, 5000000, 10000000, 20000000], USD: [2000, 5000, 10000, 20000] };
+const sim = { moneda: "ARS", plazo: 12, modo: "cobro", monto: 5000000 };
+const fmt = (n, m = sim.moneda) => (m === "ARS" ? pesos(n) : usd(n));
+const corto = (n, m = sim.moneda) => m === "ARS" ? (n >= 1e6 ? "$" + (n / 1e6).toLocaleString("es-AR", { maximumFractionDigits: 1 }) + " M" : pesos(n)) : usd(n);
+
+function simular() {
+  const { moneda: m, plazo: N, modo, monto } = sim, t = TASA[m];
+  document.querySelectorAll(".segmento").forEach(g => g.querySelectorAll("button").forEach(b => b.setAttribute("aria-pressed", String(String(sim[g.dataset.grupo]) === b.dataset.valor))));
+  $("#simRapidos").innerHTML = RAPIDOS[m].map(v => `<button type="button" data-rapido="${v}" aria-pressed="${v === monto}">${corto(v)}</button>`).join("");
+  const bajo = monto < MINIMO[m];
+  $("#simError").hidden = !bajo; $("#simError").textContent = bajo ? `El monto mínimo en ${m === "ARS" ? "pesos" : "dólares"} es ${fmt(MINIMO[m])}.` : "";
+  const base = Math.max(monto, 0);
+  // Mes a mes: capital y ganancia acumulada
+  const meses = Array.from({ length: N }, (_, k) => {
+    const g = modo === "cobro" ? base * t * (k + 1) : base * (Math.pow(1 + t, k + 1) - 1);
+    return { capital: base, ganancia: g };
+  });
+  const ganancia = meses[N - 1].ganancia, mensual = base * t;
+  const cifras = modo === "cobro"
+    ? [["Cobrás por mes", fmt(mensual)], [`Ganancia en ${N} meses`, fmt(ganancia)], ["Al final", `recuperás ${fmt(base)}`]]
+    : [["Ganancia el primer mes", fmt(mensual)], [`Ganancia en ${N} meses`, fmt(ganancia)], ["Terminás con", fmt(base + ganancia)]];
+  $("#simCifras").innerHTML = cifras.map(([e, v], i) => `<div class="${i === 1 ? "destacada" : ""}"><span>${e}</span><b>${v}</b></div>`).join("");
+  const tope = base + ganancia || 1;
+  $("#simGrafico").innerHTML = meses.map((x, k) => `<div class="barra" title="Mes ${k + 1}: ${fmt(x.capital + x.ganancia)}"><i class="gan" style="height:${(x.ganancia / tope) * 100}%"></i><i class="cap" style="height:${(x.capital / tope) * 100}%"></i>${(k + 1) % (N > 12 ? 6 : 3) === 0 ? `<em>${k + 1}</em>` : ""}</div>`).join("");
+  const texto = `Hola, quiero invertir en Venta Store.\nMonto: ${fmt(base)}\nPlazo: ${N} meses\n${modo === "cobro" ? "Quiero cobrar la ganancia cada mes" : "Quiero reinvertir la ganancia"}\nTasa: ${Math.round(t * 100)} % mensual en ${m === "ARS" ? "pesos" : "dólares"}`;
+  const wa = $("#simWa"); wa.textContent = bajo ? "Quiero invertir" : `Quiero invertir ${fmt(base)}`;
+  wa.href = `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(texto)}`;
+}
+function ponerMonto(v) { sim.monto = v; $("#simMonto").value = v ? Number(v).toLocaleString("es-AR") : ""; simular(); }
+$("#simMonto").addEventListener("input", ev => { const d = ev.target.value.replace(/\D/g, "").slice(0, 12); sim.monto = Number(d) || 0; ev.target.value = d ? Number(d).toLocaleString("es-AR") : ""; simular(); });
+document.querySelector(".sim-controles").addEventListener("click", ev => {
+  const r = ev.target.closest("[data-rapido]"); if (r) return ponerMonto(Number(r.dataset.rapido));
+  const b = ev.target.closest(".segmento button"); if (!b) return;
+  const g = b.parentElement.dataset.grupo;
+  if (g === "moneda") { sim.moneda = b.dataset.valor; return ponerMonto(RAPIDOS[sim.moneda][1]); }
+  sim[g] = g === "plazo" ? Number(b.dataset.valor) : b.dataset.valor; simular();
+});
+ponerMonto(sim.monto);
 iniciar();
