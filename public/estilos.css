@@ -175,7 +175,7 @@ details p { padding: 0 20px 18px; color: var(--piedra); }
 .sim-error { background: #3A1A12; color: #F6B4A0; border-radius: 12px; padding: 10px 12px; font-weight: 600; font-size: 14px; }
 .sim-resultado .btn { align-self: flex-start; }
 @media (max-width: 860px) { .sim { grid-template-columns: 1fr; } .respaldo { grid-template-columns: 1fr 1fr; } }
-@media (max-width: 520px) { .sim-cifras { grid-template-columns: 1fr; } .sim-cifras b { font-size: 24px; } .sim-resultado .btn { align-self: stretch; } .segmento button { font-size: 13px; } }
+@media (max-width: 520px) { .sim-cifras { grid-template-columns: 1fr 1fr; } .sim-cifras .destacada { grid-column: 1 / -1; order: -1; } .sim-cifras b { font-size: 19px; } .sim-cifras .destacada b { font-size: 28px; } .grafico { height: 130px; } .sim-resultado .btn { align-self: stretch; } .segmento button { font-size: 13px; } }
 @media (max-width: 520px) { .respaldo { grid-template-columns: 1fr; } .tasa b { font-size: 46px; } }
 
 /* (sin uso) mención anterior a Capitals */
