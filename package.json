@@ -1,0 +1,9 @@
+{
+  "name": "venta-store-sitio",
+  "version": "2.0.0",
+  "private": true,
+  "description": "Sitio de Venta Store (ventastore.store): catálogo con pedido por WhatsApp.",
+  "main": "server.js",
+  "scripts": { "start": "node server.js" },
+  "engines": { "node": ">=18" }
+}
