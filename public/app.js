@@ -57,6 +57,7 @@ function tarjeta(p) {
       ${p.conAccesorios ? '<p class="incluye">Llega con vidrio templado, funda, cable y auriculares de regalo</p>' : ""}
       <p class="precio">${usd(p.usd)}</p>
       ${datos.dolar > 0 ? `<p class="pesos">${pesos(p.usd * datos.dolar)} al dólar de hoy</p>` : ""}
+      <p class="envio-gratis">Envío gratis a todo el país</p>
       <p class="cuota-nota"><a href="${enlaceCuotas(p)}" target="_blank" rel="noopener">o en cuotas sin tarjeta, en Posadas ›</a></p>
       <button class="btn pri${enPedido ? " sumado" : ""}" type="button" data-sumar="${p.id}">${enPedido ? `En el pedido (${enPedido.cant})` : "Sumar al pedido"}</button>
     </div></article>`;
