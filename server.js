@@ -124,6 +124,31 @@ function prolijo(p) {
     consultarColor: !col && ["iphone", "ipad", "mac", "watch"].includes(categoria) };
 }
 
+/* ---------- Usados: pestaña "Usados" de la planilla (Modelo · Capacidad · Costo USD) ---------- */
+// Al cliente se le ofrece el costo menos TOMA_MENOS (100 USD). El costo nunca sale del servidor.
+const TOMA_MENOS = numero(process.env.TOMA_MENOS) || 100;
+let cacheUsados = { hasta: 0, datos: null };
+async function usados() {
+  if (cacheUsados.datos && Date.now() < cacheUsados.hasta) return cacheUsados.datos;
+  let lista = [];
+  try {
+    const id = process.env.GOOGLE_SHEET_ID, prueba = process.env.USADOS_CSV; // USADOS_CSV: archivo local, solo para probar
+    if (id || prueba) {
+      let texto = "";
+      if (prueba) texto = fs.readFileSync(prueba, "utf8");
+      else { const r = await fetch(`https://docs.google.com/spreadsheets/d/${encodeURIComponent(id)}/gviz/tq?tqx=out:csv&sheet=Usados`, { signal: AbortSignal.timeout(10000) }); if (r.ok) texto = await r.text(); }
+      const filas = csv(texto);
+      // Si la pestaña no existe, Google devuelve la primera (productos): sin columna "Costo" no se usa
+      const cab = (filas[0] || []).map(c => String(c).toLowerCase());
+      const iM = cab.findIndex(c => /modelo|nombre|equipo/.test(c)), iC = cab.findIndex(c => /capacidad|gb/.test(c)), iP = cab.findIndex(c => /costo/.test(c));
+      if (iM >= 0 && iP >= 0) lista = filas.slice(1).map(f => ({ modelo: prolijo({ nombre: f[iM] || "", descripcion: "", categoria: "", usd: 0, imagen: "" }).nombre, capacidad: iC >= 0 ? String(f[iC] || "").trim().replace(/\s*(gb|tb)$/i, (_, u) => " " + u.toUpperCase()) : "", toma: Math.round(numero(f[iP]) - TOMA_MENOS) }))
+        .filter(u => u.modelo && u.toma > 0);
+    }
+  } catch (e) { console.error("No se pudo leer Usados:", e.message); if (cacheUsados.datos) return cacheUsados.datos; }
+  cacheUsados = { hasta: Date.now() + MINUTOS * 60e3, datos: { usados: lista } };
+  return cacheUsados.datos;
+}
+
 async function catalogo() {
   if (cache.datos && Date.now() < cache.hasta) return cache.datos;
   let base = null;
@@ -156,6 +181,10 @@ const servidor = http.createServer(async (req, res) => {
     // La dirección principal es ventastore.store: www lleva ahí
     if ((req.headers.host || "").toLowerCase().startsWith("www.ventastore.store")) { res.writeHead(301, { Location: "https://ventastore.store" + req.url }); return res.end(); }
     if (ruta === "/salud") { res.writeHead(200, { "Content-Type": "application/json" }); return res.end('{"ok":true}'); }
+    if (ruta === "/api/usados") {
+      const d = await usados();
+      res.writeHead(200, { ...CABECERAS, "Content-Type": TIPOS[".json"], "Cache-Control": "public, max-age=60" }); return res.end(JSON.stringify(d));
+    }
     if (ruta === "/api/catalogo") {
       const d = await catalogo();
       res.writeHead(200, { ...CABECERAS, "Content-Type": TIPOS[".json"], "Cache-Control": "public, max-age=60" }); return res.end(JSON.stringify(d));
@@ -173,4 +202,4 @@ const servidor = http.createServer(async (req, res) => {
 });
 
 if (require.main === module) servidor.listen(PUERTO, () => console.log("Sitio de Venta Store en el puerto " + PUERTO));
-module.exports = { prolijo, csv, catalogo };
+module.exports = { prolijo, csv, catalogo, usados };

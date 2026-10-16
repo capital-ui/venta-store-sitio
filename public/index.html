@@ -19,7 +19,7 @@
 <meta name="twitter:card" content="summary_large_image">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&family=Instrument+Sans:wght@400..700&display=swap">
-<link rel="stylesheet" href="/estilos.css?v=10">
+<link rel="stylesheet" href="/estilos.css?v=11">
 <script type="application/ld+json">
 {"@context":"https://schema.org","@type":"Store","name":"Venta Store","url":"https://ventastore.store/","logo":"https://ventastore.store/icono-180.png","image":"https://ventastore.store/compartir.png?v=2","telephone":"+54 9 3764 58-6667","email":"capital@ventastore.store","address":{"@type":"PostalAddress","addressLocality":"Posadas","addressRegion":"Misiones","addressCountry":"AR"},"openingHoursSpecification":[{"@type":"OpeningHoursSpecification","dayOfWeek":["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"],"opens":"09:00","closes":"18:00"}],"sameAs":["https://www.instagram.com/_ventastore_/"],"areaServed":"AR"}
 </script>
@@ -100,8 +100,15 @@
       </div>
       <div class="usado">
         <h3>Tomamos tu iPhone usado</h3>
-        <p>Lo tomamos en parte de pago. Mandanos modelo, capacidad y el estado de la batería, y te decimos cuánto vale.</p>
-        <a class="btn sec-claro" href="https://wa.me/5493764586667?text=Hola%2C%20quiero%20entregar%20mi%20iPhone%20en%20parte%20de%20pago" target="_blank" rel="noopener">Cotizar mi usado</a>
+        <p id="uTexto">Lo tomamos en parte de pago. Mandanos modelo, capacidad y el estado de la batería, y te decimos cuánto vale.</p>
+        <form class="cotizador" id="cotizador" hidden>
+          <label>Modelo<select id="uModelo"></select></label>
+          <label>Capacidad<select id="uCapacidad"></select></label>
+          <label>Batería (%)<input id="uBateria" type="number" inputmode="numeric" min="50" max="100" placeholder="Ej.: 88"></label>
+          <label>Estado<select id="uEstado"><option>Impecable</option><option>Con detalles de uso</option><option>Pantalla o batería cambiada</option><option>Roto o con fallas</option></select></label>
+          <div class="cot-valor" id="uValor" aria-live="polite"></div>
+        </form>
+        <a class="btn sec-claro" id="uEnviar" href="https://wa.me/5493764586667?text=Hola%2C%20quiero%20entregar%20mi%20iPhone%20en%20parte%20de%20pago" target="_blank" rel="noopener">Cotizar mi usado</a>
       </div>
     </div>
   </section>
@@ -197,6 +204,6 @@
 </aside>
 <button class="barra-pedido" id="barraPedido" type="button" data-abrir-pedido hidden></button>
 
-<script src="/app.js?v=11" defer></script>
+<script src="/app.js?v=12" defer></script>
 </body>
 </html>

@@ -251,3 +251,14 @@ details p { padding: 0 20px 18px; color: var(--piedra); }
 .efectivo { font-size: 14px; font-weight: 700; color: #1F7A4A; margin-top: 2px; }
 .total s { display: block; font-size: 15px; font-weight: 600; color: var(--piedra); font-family: var(--texto); }
 .total small.ahorro { color: #1F7A4A; font-weight: 700; }
+/* Cotizador de usados */
+.cotizador { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 12px; margin: 16px 0 18px; }
+.cotizador label { display: grid; gap: 4px; font-size: 13px; font-weight: 600; color: #FCE8E1; }
+.cotizador select, .cotizador input { font: inherit; font-size: 15px; font-weight: 500; color: var(--selva); background: var(--blanco); border: 0; border-radius: 10px; padding: 10px 12px; min-height: 44px; width: 100%; }
+.cotizador select:disabled { opacity: .6; }
+.cot-valor { grid-column: 1 / -1; color: var(--blanco); }
+.cot-valor:empty { display: none; }
+.cot-valor span { display: block; font-size: 14px; color: #FCE8E1; }
+.cot-valor b { display: block; font-family: var(--titulo); font-size: 34px; font-weight: 800; letter-spacing: -.02em; line-height: 1.1; }
+.cot-valor small { display: block; font-size: 12.5px; color: #FCE8E1; }
+@media (max-width: 420px) { .cotizador { grid-template-columns: 1fr; } }

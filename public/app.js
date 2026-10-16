@@ -190,3 +190,35 @@ document.querySelector(".sim-controles").addEventListener("click", ev => {
 });
 ponerMonto(sim.monto);
 iniciar();
+
+/* ---------- Cotizador de usados (valores de la pestaña "Usados" de la planilla) ---------- */
+(async () => {
+  let lista = [];
+  try { lista = (await (await fetch("/api/usados")).json()).usados || []; } catch {}
+  if (!lista.length) return; // sin tabla queda el botón de WhatsApp de siempre
+  const form = $("#cotizador"), mod = $("#uModelo"), cap = $("#uCapacidad"), bat = $("#uBateria"), est = $("#uEstado"), valor = $("#uValor"), enviar = $("#uEnviar");
+  const modelos = [...new Set(lista.map(u => u.modelo))];
+  mod.innerHTML = '<option value="">Elegí tu modelo</option>' + modelos.map(m => `<option>${esc(m)}</option>`).join("") + '<option value="otro">Otro modelo</option>';
+  form.hidden = false; $("#uTexto").textContent = "Lo tomamos en parte de pago. Elegí tu equipo y mirá cuánto vale.";
+  const capacidades = () => {
+    const c = lista.filter(u => u.modelo === mod.value);
+    cap.innerHTML = c.length ? c.map(u => `<option>${esc(u.capacidad)}</option>`).join("") : '<option value="">—</option>';
+    cap.disabled = !c.length;
+  };
+  const calcular = () => {
+    const u = lista.find(x => x.modelo === mod.value && x.capacidad === cap.value);
+    const malo = est.value === "Roto o con fallas";
+    valor.innerHTML = !mod.value ? "" : mod.value === "otro" ? "<span>Contanos qué equipo es y te lo cotizamos.</span>"
+      : u && !malo ? `<span>Te lo tomamos en aprox.</span><b>${usd(u.toma)}</b><small>en parte de pago · valor estimado, sujeto a revisión del equipo</small>`
+      : "<span>Lo tenemos que ver para cotizarlo.</span>";
+    const equipo = mod.value === "otro" ? "(escribí tu modelo y capacidad)" : `${mod.value} ${cap.value}`.trim();
+    const texto = ["¡Hola Venta Store! Quiero entregar mi usado en parte de pago.", "",
+      `Equipo: ${mod.value ? equipo : ""}`, `Batería: ${bat.value ? bat.value + " %" : ""}`, `Estado: ${est.value}`,
+      u && !malo ? `Valor estimado en el sitio: ${usd(u.toma)}` : "", "", "¿Qué equipo me puedo llevar?"].filter((l, i, a) => l !== "" || (a[i - 1] && a[i - 1] !== "")).join("\n");
+    enviar.href = `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(texto)}`;
+    enviar.textContent = u && !malo ? "Quiero entregarlo" : "Cotizar mi usado";
+  };
+  mod.addEventListener("change", () => { capacidades(); calcular(); });
+  [cap, est].forEach(e => e.addEventListener("change", calcular)); bat.addEventListener("input", calcular);
+  capacidades(); calcular();
+})();
