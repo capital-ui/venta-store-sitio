@@ -4,7 +4,7 @@ const WHATSAPP = "5493764586667";
 const DESC_EFECTIVO = 20; // USD menos por equipo pagando en efectivo
 const sellado = p => p.condicion === "Garantía Apple"; // el descuento en efectivo es solo para sellados
 const enEfectivo = () => /efectivo/i.test($("#pago").value);
-const CATEGORIAS = [["todos", "Todos"], ["iphone", "iPhone"], ["ipad", "iPad"], ["mac", "MacBook"], ["watch", "Apple Watch"], ["consolas", "Consolas"], ["accesorios", "Accesorios"]];
+const CATEGORIAS = [["todos", "Todos"], ["iphone", "iPhone"], ["ipad", "iPad"], ["mac", "MacBook"], ["watch", "Apple Watch"], ["consolas", "Consolas"], ["lentes", "Lentes"], ["accesorios", "Accesorios"]];
 const CONDICIONES = { "Swap": "swap", "CPO": "cpo", "Garantía Apple": "apple" };
 const $ = s => document.querySelector(s);
 const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
