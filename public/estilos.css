@@ -77,7 +77,7 @@ p { margin: 0; }
 .filtros button[aria-pressed="true"] { background: var(--selva); color: var(--blanco); border-color: var(--selva); }
 .grilla { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 16px; margin-top: 22px; }
 .tarjeta { background: var(--blanco); border: 1px solid var(--linea); border-radius: 20px; overflow: hidden; display: flex; flex-direction: column; }
-.foto { aspect-ratio: 1 / 1; background: var(--blanco); display: grid; place-items: center; padding: 18px; border-bottom: 1px solid var(--linea); position: relative; }
+.foto { aspect-ratio: 1 / 1; background: var(--blanco); display: grid; place-items: center; padding: 8px; border-bottom: 1px solid var(--linea); position: relative; }
 .foto img { width: 100%; height: 100%; object-fit: contain; }
 .foto .pill { position: absolute; left: 14px; top: 14px; }
 .info { padding: 16px 18px 18px; display: flex; flex-direction: column; gap: 4px; flex: 1; }
@@ -229,7 +229,7 @@ details p { padding: 0 20px 18px; color: var(--piedra); }
   .btn-pedido span { display: none; }
   .pilares { grid-template-columns: 1fr; }
   .grilla { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
-  .foto { padding: 10px; }
+  .foto { padding: 4px; }
   .info { padding: 12px 12px 14px; }
   .info h3 { font-size: 17px; }
   .precio { font-size: 24px; }

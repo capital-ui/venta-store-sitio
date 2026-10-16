@@ -50,6 +50,22 @@ function deFormatoViejo(lista) {
   return { dolar, productos: lista.map(p => ({ nombre: p.name, descripcion: p.description || "", usd: numero(p.price), categoria: String(p.category || "").toLowerCase(), imagen: p.imageUrl || "", stock: p.stock })) };
 }
 
+/* ---------- Fotos propias (public/productos): cuadradas, fondo blanco; mandan sobre la de la planilla ---------- */
+const FOTOS = new Set((() => { try { return fs.readdirSync(path.join(__dirname, "public", "productos")); } catch { return []; } })().map(f => f.replace(/\.webp$/, "")));
+function fotoDe(nombre) {
+  const n = nombre.toLowerCase(); let k = null;
+  const ip = n.match(/iphone\s*(\d+)\s*(e)?\b/);
+  if (/iphone/.test(n) && /\bair\b/.test(n)) k = "iphone-air";
+  else if (ip) { k = "iphone-" + ip[1] + (ip[2] || ""); if (/\bpro\b/.test(n) && FOTOS.has(k + "-pro")) k += "-pro"; }
+  else if (/ipad/.test(n)) k = /air/.test(n) ? "ipad-air" : /pro/.test(n) ? "ipad-pro" : "ipad";
+  else if (/macbook/.test(n)) k = /pro/.test(n) ? "macbook-pro" : /neo/.test(n) ? "macbook-neo" : "macbook-air";
+  else if (/watch/.test(n)) k = /ultra/.test(n) ? "watch-ultra" : /\bse\b/.test(n) ? "watch-se" : "watch-series";
+  else if (/airtag/.test(n)) k = "airtag";
+  else if (/playstation|ps5/.test(n)) k = "ps5";
+  else if (/switch 2/.test(n)) k = "switch-2";
+  return k && FOTOS.has(k) ? "/productos/" + k + ".webp?v=1" : null;
+}
+
 /* ---------- Nombres prolijos y datos de cada equipo (la planilla queda como está) ---------- */
 const CATEGORIAS = { celulares: "iphone", ipad: "ipad", macbook: "mac", watch: "watch", consolas: "consolas" };
 function prolijo(p) {
@@ -79,7 +95,7 @@ function prolijo(p) {
   }
   if (pulgadas) nombre = nombre.replace(/\s1\d$/, "") + " " + pulgadas;
   const categoria = /airtag/i.test(nombre) ? "accesorios" : CATEGORIAS[p.categoria] || "otros";
-  return { nombre, detalle: detalle.join(" · "), condicion, categoria, usd: p.usd, imagen: p.imagen, conAccesorios: categoria === "iphone" };
+  return { nombre, detalle: detalle.join(" · "), condicion, categoria, usd: p.usd, imagen: fotoDe(nombre) || p.imagen, conAccesorios: categoria === "iphone" };
 }
 
 async function catalogo() {
