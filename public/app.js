@@ -232,7 +232,7 @@ const USADO_BATERIA_MEDIA = 15, USADO_BATERIA_BAJA = 30, USADO_DETALLES = 30, US
       v = u.swap; lineas.push([chk.swap.checked ? "Valor como Swap" : "Valor como Swap (sin caja, batería menor a 90 % o reparado)", usd(v)]);
       if (b < 85) { v -= USADO_BATERIA_BAJA; lineas.push([`Batería ${b} %`, "−" + usd(USADO_BATERIA_BAJA)]); }
       else if (b < 90) { v -= USADO_BATERIA_MEDIA; lineas.push([`Batería ${b} %`, "−" + usd(USADO_BATERIA_MEDIA)]); }
-    } else return { aviso: "Lo tenemos que ver para cotizarlo." };
+    } else return { aviso: "Este caso te lo cotizamos por WhatsApp: tocá el botón y te respondemos enseguida." };
     if (est.value === "detalles") { v -= USADO_DETALLES; lineas.push(["Rayones o marcas", "−" + usd(USADO_DETALLES)]); }
     if (est.value === "trizado") { v -= USADO_TRIZADO; lineas.push(["Tapa trasera trizada", "−" + usd(USADO_TRIZADO)]); }
     if (!chk.original.checked) { v -= USADO_REPARADO; lineas.push(["Reparado con piezas no originales", "−" + usd(USADO_REPARADO)]); }

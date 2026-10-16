@@ -124,9 +124,27 @@ function prolijo(p) {
     consultarColor: !col && ["iphone", "ipad", "mac", "watch"].includes(categoria) };
 }
 
-/* ---------- Usados: pestaña "Usados" de la planilla (Modelo · Capacidad · Costo USD) ---------- */
-// Al cliente se le ofrece el costo menos TOMA_MENOS (100 USD). El costo nunca sale del servidor.
-const TOMA_MENOS = numero(process.env.TOMA_MENOS) || 100;
+/* ---------- Usados: valores para el cotizador ----------
+   Se arman solos desde el catálogo: costo = precio publicado − MARGEN (100 USD) y al cliente se le ofrece
+   costo − TOMA_MENOS (100 USD), o sea precio publicado − 200. Los "Garantía Apple" dan el valor de un usado
+   comprado sellado; los "Swap", el de un Swap. Si hay varios colores, se toma el más barato.
+   Opcional: la pestaña "Usados" (Modelo · Capacidad · Costo Garantía Apple · Costo Swap) pisa esos valores.
+   El costo nunca sale del servidor. */
+const TOMA_MENOS = numero(process.env.TOMA_MENOS) || 100, MARGEN = numero(process.env.MARGEN) || 100;
+function usadosDelCatalogo(productos) {
+  const mapa = new Map();
+  for (const p of productos) {
+    if (p.categoria !== "iphone") continue;
+    const tipo = p.condicion === "Garantía Apple" ? "original" : p.condicion === "Swap" ? "swap" : null;
+    const capacidad = (p.detalle.match(/\d+ (GB|TB)/) || [])[0] || "";
+    const v = Math.round(p.usd - MARGEN - TOMA_MENOS);
+    if (!tipo || !capacidad || v <= 0) continue;
+    const k = p.nombre + "|" + capacidad, u = mapa.get(k) || { modelo: p.nombre, capacidad, original: null, swap: null };
+    u[tipo] = u[tipo] == null ? v : Math.min(u[tipo], v);
+    mapa.set(k, u);
+  }
+  return mapa;
+}
 let cacheUsados = { hasta: 0, datos: null };
 async function usados() {
   if (cacheUsados.datos && Date.now() < cacheUsados.hasta) return cacheUsados.datos;
@@ -152,6 +170,12 @@ async function usados() {
         .filter(u => u.modelo && (u.original || u.swap));
     }
   } catch (e) { console.error("No se pudo leer Usados:", e.message); if (cacheUsados.datos) return cacheUsados.datos; }
+  // Valores automáticos del catálogo; lo cargado en la pestaña "Usados" manda sobre ellos
+  let mapa = new Map();
+  try { mapa = usadosDelCatalogo((await catalogo()).productos); } catch (e) { console.error("Usados del catálogo:", e.message); }
+  for (const u of lista) { const k = u.modelo + "|" + u.capacidad, a = mapa.get(k) || {}; mapa.set(k, { ...a, ...u, original: u.original ?? a.original ?? null, swap: u.swap ?? a.swap ?? null }); }
+  const orden = (a, b) => a.modelo.localeCompare(b.modelo, "es", { numeric: true }) || parseInt(a.capacidad) * (/TB/.test(a.capacidad) ? 1024 : 1) - parseInt(b.capacidad) * (/TB/.test(b.capacidad) ? 1024 : 1);
+  lista = [...mapa.values()].sort(orden);
   cacheUsados = { hasta: Date.now() + MINUTOS * 60e3, datos: { usados: lista } };
   return cacheUsados.datos;
 }
