@@ -105,6 +105,8 @@ const CABECERAS = { "X-Content-Type-Options": "nosniff", "Referrer-Policy": "str
 const servidor = http.createServer(async (req, res) => {
   const url = new URL(req.url, "http://x"), ruta = decodeURIComponent(url.pathname);
   try {
+    // La dirección principal es ventastore.store: www lleva ahí
+    if ((req.headers.host || "").toLowerCase().startsWith("www.ventastore.store")) { res.writeHead(301, { Location: "https://ventastore.store" + req.url }); return res.end(); }
     if (ruta === "/salud") { res.writeHead(200, { "Content-Type": "application/json" }); return res.end('{"ok":true}'); }
     if (ruta === "/api/catalogo") {
       const d = await catalogo();
