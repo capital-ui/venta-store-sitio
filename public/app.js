@@ -47,7 +47,7 @@ function tarjeta(p) {
       <h3>${esc(p.nombre)}</h3>
       ${p.detalle ? `<p class="detalle">${esc(p.detalle)}</p>` : ""}
       ${p.consultarColor ? '<p class="colores">Consultá colores disponibles</p>' : ""}
-      ${p.conAccesorios ? '<p class="incluye">Llega con vidrio templado, funda, cable y AirPods</p>' : ""}
+      ${p.conAccesorios ? '<p class="incluye">Llega con vidrio templado, funda, cable y auriculares de regalo</p>' : ""}
       <p class="precio">${usd(p.usd)}</p>
       ${datos.dolar > 0 ? `<p class="pesos">${pesos(p.usd * datos.dolar)} al dólar de hoy</p>` : ""}
       <p class="cuota-nota">o en cuotas sin tarjeta, en Posadas</p>
