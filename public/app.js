@@ -39,6 +39,13 @@ function pintarFiltros() {
   $("#filtrosCond").innerHTML = [["", "Todas las condiciones"], ...conds.map(c => [c, c])].map(([id, et]) => `<button type="button" data-cond="${esc(id)}" aria-pressed="${condicion === id}">${esc(et)}</button>`).join("");
 }
 
+function enlaceCuotas(p) {
+  const texto = [`¡Hola Venta Store! Me interesa el *${p.nombre}* en cuotas sin tarjeta.`,
+    `${[p.detalle, p.condicion].filter(Boolean).join(" · ")}${p.detalle || p.condicion ? " · " : ""}${usd(p.usd)}`,
+    p.consultarColor ? "Color: a consultar" : "", "",
+    "Cuánto puedo dejar de entrega: ", "Soy de Posadas: sí / no", "", "¿Qué plan me pueden ofrecer?"].filter((l, i) => l || i > 2).join("\n");
+  return `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(texto)}`;
+}
 function tarjeta(p) {
   const enPedido = pedido.find(x => x.clave === p.clave);
   return `<article class="tarjeta">
@@ -50,7 +57,7 @@ function tarjeta(p) {
       ${p.conAccesorios ? '<p class="incluye">Llega con vidrio templado, funda, cable y auriculares de regalo</p>' : ""}
       <p class="precio">${usd(p.usd)}</p>
       ${datos.dolar > 0 ? `<p class="pesos">${pesos(p.usd * datos.dolar)} al dólar de hoy</p>` : ""}
-      <p class="cuota-nota">o en cuotas sin tarjeta, en Posadas</p>
+      <p class="cuota-nota"><a href="${enlaceCuotas(p)}" target="_blank" rel="noopener">o en cuotas sin tarjeta, en Posadas ›</a></p>
       <button class="btn pri${enPedido ? " sumado" : ""}" type="button" data-sumar="${p.id}">${enPedido ? `En el pedido (${enPedido.cant})` : "Sumar al pedido"}</button>
     </div></article>`;
 }
