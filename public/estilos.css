@@ -247,3 +247,7 @@ details p { padding: 0 20px 18px; color: var(--piedra); }
 .aviso-envio svg { flex: none; }
 .envio-gratis { font-size: 13px; font-weight: 600; color: var(--selva); margin-top: 6px; display: flex; align-items: center; gap: 6px; }
 .envio-gratis::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: #2E8B57; flex: none; }
+/* Descuento en efectivo */
+.efectivo { font-size: 14px; font-weight: 700; color: #1F7A4A; margin-top: 2px; }
+.total s { display: block; font-size: 15px; font-weight: 600; color: var(--piedra); font-family: var(--texto); }
+.total small.ahorro { color: #1F7A4A; font-weight: 700; }

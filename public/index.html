@@ -19,7 +19,7 @@
 <meta name="twitter:card" content="summary_large_image">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&family=Instrument+Sans:wght@400..700&display=swap">
-<link rel="stylesheet" href="/estilos.css?v=9">
+<link rel="stylesheet" href="/estilos.css?v=10">
 <script type="application/ld+json">
 {"@context":"https://schema.org","@type":"Store","name":"Venta Store","url":"https://ventastore.store/","logo":"https://ventastore.store/icono-180.png","image":"https://ventastore.store/compartir.png?v=2","telephone":"+54 9 3764 58-6667","email":"capital@ventastore.store","address":{"@type":"PostalAddress","addressLocality":"Posadas","addressRegion":"Misiones","addressCountry":"AR"},"openingHoursSpecification":[{"@type":"OpeningHoursSpecification","dayOfWeek":["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"],"opens":"09:00","closes":"18:00"}],"sameAs":["https://www.instagram.com/_ventastore_/"],"areaServed":"AR"}
 </script>
@@ -188,7 +188,7 @@
     <p class="vacio" id="vacio">Todavía no sumaste nada. Elegí un equipo del catálogo y tocá “Sumar al pedido”.</p>
     <div id="datosPedido" hidden>
       <div class="total" id="total"></div>
-      <label>¿Cómo pagás?<select id="pago"><option>Transferencia</option><option>Efectivo</option><option>Mercado Pago</option><option>USDT</option><option>Cuotas sin tarjeta (solo Posadas)</option></select></label>
+      <label>¿Cómo pagás?<select id="pago"><option>Transferencia</option><option value="Efectivo">Efectivo (20 USD menos en sellados)</option><option>Mercado Pago</option><option>USDT</option><option>Cuotas sin tarjeta (solo Posadas)</option></select></label>
       <label>¿A dónde lo enviamos?<input id="envio" type="text" placeholder="Ciudad o “retiro en Posadas”" autocomplete="address-level2"></label>
       <label>Tu nombre (opcional)<input id="nombre" type="text" autocomplete="name"></label>
     </div>
@@ -197,6 +197,6 @@
 </aside>
 <button class="barra-pedido" id="barraPedido" type="button" data-abrir-pedido hidden></button>
 
-<script src="/app.js?v=9" defer></script>
+<script src="/app.js?v=10" defer></script>
 </body>
 </html>

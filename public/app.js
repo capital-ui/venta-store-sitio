@@ -1,6 +1,9 @@
 "use strict";
 /* Catálogo y pedido por WhatsApp de Venta Store. */
 const WHATSAPP = "5493764586667";
+const DESC_EFECTIVO = 20; // USD menos por equipo pagando en efectivo
+const sellado = p => p.condicion === "Garantía Apple"; // el descuento en efectivo es solo para sellados
+const enEfectivo = () => /efectivo/i.test($("#pago").value);
 const CATEGORIAS = [["todos", "Todos"], ["iphone", "iPhone"], ["ipad", "iPad"], ["mac", "MacBook"], ["watch", "Apple Watch"], ["consolas", "Consolas"], ["accesorios", "Accesorios"]];
 const CONDICIONES = { "Swap": "swap", "CPO": "cpo", "Garantía Apple": "apple" };
 const $ = s => document.querySelector(s);
@@ -56,6 +59,7 @@ function tarjeta(p) {
       ${p.consultarColor ? '<p class="colores">Consultá colores disponibles</p>' : ""}
       ${p.conAccesorios ? '<p class="incluye">Llega con vidrio templado, funda, cable y auriculares de regalo</p>' : ""}
       <p class="precio">${usd(p.usd)}</p>
+      ${sellado(p) ? `<p class="efectivo">${usd(p.usd - DESC_EFECTIVO)} en efectivo</p>` : ""}
       ${datos.dolar > 0 ? `<p class="pesos">${pesos(p.usd * datos.dolar)} al dólar de hoy</p>` : ""}
       <p class="envio-gratis">Envío gratis a todo el país</p>
       <p class="cuota-nota"><a href="${enlaceCuotas(p)}" target="_blank" rel="noopener">o en cuotas sin tarjeta, en Posadas ›</a></p>
@@ -80,7 +84,7 @@ function sumar(id) {
 function cambiar(k, d) { const x = pedido.find(i => i.clave === k); if (!x) return; x.cant += d; pedido = pedido.filter(i => i.cant > 0); guardar(); pintar(); pintarPedido(); }
 
 function mensaje() {
-  const total = pedido.reduce((a, x) => a + x.usd * x.cant, 0);
+  const total = pedido.reduce((a, x) => a + x.usd * x.cant, 0), desc = descuento(), final = total - desc;
   const envio = $("#envio").value.trim(), nombre = $("#nombre").value.trim();
   const items = pedido.map((x, i) => [
     `${i + 1}) *${x.nombre}*${x.cant > 1 ? ` × ${x.cant}` : ""}`,
@@ -88,10 +92,12 @@ function mensaje() {
     x.consultarColor ? "   Color: a consultar" : "",
     `   ${usd(x.usd * x.cant)}`].filter(Boolean).join("\n"));
   return [`¡Hola Venta Store! ${nombre ? `Soy ${nombre}. ` : ""}Quiero hacer este pedido:`, "", ...items, "",
-    `*Total: ${usd(total)}*${datos.dolar > 0 ? ` (${pesos(total * datos.dolar)} al dólar de hoy)` : ""}`,
+    ...(desc ? [`Subtotal: ${usd(total)}`, `Descuento en efectivo (sellados): −${usd(desc)}`] : []),
+    `*Total: ${usd(final)}*${datos.dolar > 0 ? ` (${pesos(final * datos.dolar)} al dólar de hoy)` : ""}`,
     `Pago: ${$("#pago").value}`, `Envío: ${envio || "a confirmar"}`, "",
     "¿Me confirman disponibilidad? ¡Gracias!"].join("\n");
 }
+function descuento() { return enEfectivo() ? pedido.reduce((a, x) => a + (sellado(x) ? DESC_EFECTIVO * x.cant : 0), 0) : 0; }
 
 function pintarPedido() {
   const n = pedido.reduce((a, x) => a + x.cant, 0), total = pedido.reduce((a, x) => a + x.usd * x.cant, 0);
@@ -100,7 +106,8 @@ function pintarPedido() {
   $("#items").innerHTML = pedido.map(x => `<li>${x.imagen ? `<img src="${esc(x.imagen)}" alt="" referrerpolicy="no-referrer">` : "<span></span>"}<div><b>${esc(x.nombre)}</b><small>${esc([x.condicion, x.detalle].filter(Boolean).join(" · "))}</small><small style="display:block">${usd(x.usd * x.cant)}</small></div>
     <div class="cant"><button type="button" data-menos="${esc(x.clave)}" aria-label="Uno menos">−</button><span>${x.cant}</span><button type="button" data-mas="${esc(x.clave)}" aria-label="Uno más">+</button></div></li>`).join("");
   $("#vacio").hidden = n > 0; $("#datosPedido").hidden = !n;
-  $("#total").innerHTML = n ? `${usd(total)}${datos.dolar > 0 ? `<small>${pesos(total * datos.dolar)} al dólar de hoy</small>` : ""}` : "";
+  const desc = descuento(), final = total - desc;
+  $("#total").innerHTML = n ? `${desc ? `<s>${usd(total)}</s>` : ""}${usd(final)}${desc ? `<small class="ahorro">Ahorrás ${usd(desc)} pagando en efectivo</small>` : ""}${datos.dolar > 0 ? `<small>${pesos(final * datos.dolar)} al dólar de hoy</small>` : ""}` : "";
   const b = $("#barraPedido"); b.hidden = !n; b.textContent = `Ver mi pedido (${n}) · ${usd(total)}`;
   actualizarEnlace();
 }
@@ -139,8 +146,8 @@ document.addEventListener("click", ev => {
 });
 document.addEventListener("keydown", ev => { if (ev.key === "Escape" && $("#pedido").classList.contains("abierto")) abrir(false); });
 $("#buscar").addEventListener("input", ev => { texto = ev.target.value; pintar(); });
-["#pago", "#envio", "#nombre"].forEach(s => $(s).addEventListener("input", actualizarEnlace));
-$("#pago").addEventListener("change", actualizarEnlace);
+["#envio", "#nombre"].forEach(s => $(s).addEventListener("input", actualizarEnlace));
+$("#pago").addEventListener("change", pintarPedido);
 
 /* ---------- Simulador de inversión (6 % mensual en pesos, 3 % en dólares) ---------- */
 const TASA = { ARS: 0.06, USD: 0.03 }, MINIMO = { ARS: 3000000, USD: 2000 };
