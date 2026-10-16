@@ -69,6 +69,8 @@ function fotoDe(nombre, color) {
   else if (/ipad/.test(n)) k = /air/.test(n) ? "ipad-air" : /pro/.test(n) ? "ipad-pro" : "ipad";
   else if (/macbook/.test(n)) k = /pro/.test(n) ? "macbook-pro" : /neo/.test(n) ? "macbook-neo" : "macbook-air";
   else if (/watch/.test(n)) k = /ultra/.test(n) ? "watch-ultra" : /\bse\b/.test(n) ? "watch-se" : "watch-series";
+  // Los Series se muestran en rosa (oro rosa con malla rosa), salvo que la planilla diga otro color
+  if (k === "watch-series" && !color) color = "pink";
   else if (/airtag/.test(n)) k = "airtag";
   else if (/airpods/.test(n)) k = "airpods-pro-3";
   else if (/playstation|ps5/.test(n)) k = "ps5";

@@ -32,3 +32,4 @@ iphone-18-pro-burgundy A iphone-18-pro-finish-select-burgundy-202609
 iphone-18-pro-glacier A iphone-18-pro-finish-select-glacier-202609
 iphone-18-pro-silver A iphone-18-pro-finish-select-silver-202609
 airpods-pro-3 A airpods-pro-3-hero-select-202509
+watch-series-pink U https://store.storeimages.cdn-apple.com/4668/as-images.apple.com/is/MXLN3ref_VW_34FR+watch-case-42-aluminum-rosegold-nc-s11_VW_34FR+watch-face-42-aluminum-rosegold-s11_VW_34FR?wid=1000&hei=1000&fmt=png-alpha
