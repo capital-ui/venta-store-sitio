@@ -191,32 +191,32 @@ document.querySelector(".sim-controles").addEventListener("click", ev => {
 ponerMonto(sim.monto);
 iniciar();
 
-/* ---------- Cotizador de usados (valores de la pestaña "Usados" de la planilla) ----------
+/* ---------- Cotizador de usados (sección #usados; valores de la pestaña "Usados" de la planilla) ----------
    Nuevo/sellado + caja + batería 90-100 % + nunca reparado: se compara con Garantía Apple (costo − 100).
    Si no: se compara con Swap (costo − 100). Batería 85-89 %: −15; menor a 85 %: −30.
    Rayones o marcas: −30. Tapa trasera trizada: −25. Reparado con piezas no originales: −50.
-   Pantalla trizada: se cotiza en persona.
-   (Valores intermedios entre lo que usaba Venta Store y lo que descuenta el mercado.)
-   Si algo no funciona o falla Face ID, se cotiza en persona. Con iCloud bloqueado no se toma. */
+   Pantalla trizada o algo que no funciona: se cotiza en persona. Con iCloud bloqueado no se toma.
+   (Valores intermedios entre lo que usaba Venta Store y lo que descuenta el mercado.) */
 const USADO_BATERIA_MEDIA = 15, USADO_BATERIA_BAJA = 30, USADO_DETALLES = 30, USADO_TRIZADO = 25, USADO_REPARADO = 50;
 (async () => {
   let lista = [];
   try { lista = (await (await fetch("/api/usados")).json()).usados || []; } catch {}
   // ?demo-usados muestra el cotizador con precios de ejemplo (para verlo antes de cargar la pestaña Usados)
-  const demo = !lista.length && /demo-usados/.test(location.search);
-  if (demo) lista = [{ modelo: "iPhone 13", capacidad: "128 GB", original: 200, swap: 100 }, { modelo: "iPhone 14 Pro", capacidad: "128 GB", original: 420, swap: 300 }, { modelo: "iPhone 15", capacidad: "128 GB", original: 450, swap: 320 }];
-  if (!lista.length) return; // sin tabla queda el botón de WhatsApp de siempre
-  const form = $("#cotizador"), mod = $("#uModelo"), cap = $("#uCapacidad"), bat = $("#uBateria"), est = $("#uEstado"), valor = $("#uValor"), enviar = $("#uEnviar");
+  if (!lista.length && /demo-usados/.test(location.search)) lista = [{ modelo: "iPhone 13", capacidad: "128 GB", original: 200, swap: 100 }, { modelo: "iPhone 14 Pro", capacidad: "128 GB", original: 420, swap: 300 }, { modelo: "iPhone 15", capacidad: "128 GB", original: 450, swap: 320 }];
+  if (!lista.length) return; // sin tabla no se muestra la sección y queda el botón de WhatsApp de siempre
+  $("#usados").hidden = false; $("#navUsados").hidden = false;
+  $("#uTexto").textContent = "Lo tomamos en parte de pago. Cotizalo acá mismo en un minuto.";
+  const ir = $("#uIr"); ir.href = "#usados"; ir.removeAttribute("target"); ir.textContent = "Cotizar mi usado";
+  const mod = $("#uModelo"), cap = $("#uCapacidad"), bat = $("#uBateria"), est = $("#uEstado"), valor = $("#uValor"), detalle = $("#uDetalle"), enviar = $("#uEnviar");
   const chk = { swap: $("#cSwap"), funciona: $("#cFunciona"), faceid: $("#cFaceId"), original: $("#cOriginal"), icloud: $("#cIcloud"), caja: $("#cCaja") };
   const modelos = [...new Set(lista.map(u => u.modelo))];
   mod.innerHTML = '<option value="">Elegí tu modelo</option>' + modelos.map(m => `<option>${esc(m)}</option>`).join("") + '<option value="otro">Otro modelo</option>';
-  form.hidden = false; $("#uTexto").textContent = "Lo tomamos en parte de pago. Completá los datos y mirá cuánto vale.";
   const capacidades = () => {
     const c = lista.filter(u => u.modelo === mod.value);
     cap.innerHTML = c.length ? c.map(u => `<option>${esc(u.capacidad)}</option>`).join("") : '<option value="">—</option>';
     cap.disabled = !c.length;
   };
-  // Devuelve { v } con el valor, o { aviso } cuando no se puede dar precio
+  // Devuelve { v, lineas } con el valor y cómo se llegó, o { aviso } cuando no se puede dar precio
   const cotizar = () => {
     if (!chk.icloud.checked) return { aviso: "Con bloqueo de iCloud o sin liberar no lo podemos tomar." };
     if (est.value === "pantalla") return { aviso: "Con la pantalla trizada lo tenemos que ver para cotizarlo." };
@@ -224,21 +224,30 @@ const USADO_BATERIA_MEDIA = 15, USADO_BATERIA_BAJA = 30, USADO_DETALLES = 30, US
     const u = lista.find(x => x.modelo === mod.value && x.capacidad === cap.value), b = Number(bat.value);
     if (!b) return { aviso: "Poné el % de batería para ver cuánto vale." };
     if (!u) return { aviso: "Lo tenemos que ver para cotizarlo." };
-    let v = !chk.swap.checked && chk.caja.checked && chk.original.checked && b >= 90 && u.original ? u.original
-      : u.swap ? u.swap - (b < 85 ? USADO_BATERIA_BAJA : b < 90 ? USADO_BATERIA_MEDIA : 0) : null;
-    if (v == null) return { aviso: "Lo tenemos que ver para cotizarlo." };
-    v -= (est.value === "trizado" ? USADO_TRIZADO : est.value === "detalles" ? USADO_DETALLES : 0) + (chk.original.checked ? 0 : USADO_REPARADO);
-    return v > 0 ? { v } : { aviso: "Lo tenemos que ver para cotizarlo." };
+    const comoNuevo = !chk.swap.checked && chk.caja.checked && chk.original.checked && b >= 90 && u.original;
+    const lineas = [];
+    let v;
+    if (comoNuevo) { v = u.original; lineas.push(["Comprado sellado, con caja y batería 90 % o más", usd(v)]); }
+    else if (u.swap) {
+      v = u.swap; lineas.push([chk.swap.checked ? "Valor como Swap" : "Valor como Swap (sin caja, batería menor a 90 % o reparado)", usd(v)]);
+      if (b < 85) { v -= USADO_BATERIA_BAJA; lineas.push([`Batería ${b} %`, "−" + usd(USADO_BATERIA_BAJA)]); }
+      else if (b < 90) { v -= USADO_BATERIA_MEDIA; lineas.push([`Batería ${b} %`, "−" + usd(USADO_BATERIA_MEDIA)]); }
+    } else return { aviso: "Lo tenemos que ver para cotizarlo." };
+    if (est.value === "detalles") { v -= USADO_DETALLES; lineas.push(["Rayones o marcas", "−" + usd(USADO_DETALLES)]); }
+    if (est.value === "trizado") { v -= USADO_TRIZADO; lineas.push(["Tapa trasera trizada", "−" + usd(USADO_TRIZADO)]); }
+    if (!chk.original.checked) { v -= USADO_REPARADO; lineas.push(["Reparado con piezas no originales", "−" + usd(USADO_REPARADO)]); }
+    return v > 0 ? { v, lineas } : { aviso: "Lo tenemos que ver para cotizarlo." };
   };
   const calcular = () => {
     const elegido = mod.value && mod.value !== "otro", r = elegido ? cotizar() : {};
-    valor.innerHTML = !mod.value ? "" : mod.value === "otro" ? "<span>Contanos qué equipo es y te lo cotizamos.</span>"
-      : r.v ? `<span>Te lo tomamos en aprox.</span><b>${usd(r.v)}</b><small>en parte de pago · valor estimado, sujeto a revisión del equipo</small>`
-      : `<span>${r.aviso}</span>`;
+    valor.innerHTML = r.v ? `<span>Te lo tomamos en</span><b>${usd(r.v)}</b>`
+      : `<span>${!mod.value ? "Elegí tu modelo para ver cuánto vale." : mod.value === "otro" ? "Contanos qué equipo es y te lo cotizamos." : r.aviso}</span>`;
+    valor.classList.toggle("con-precio", !!r.v);
+    detalle.innerHTML = r.v ? r.lineas.map(([t, m]) => `<li><span>${esc(t)}</span><b>${m}</b></li>`).join("") : "";
     const si = c => c.checked ? "Sí" : "No";
     const texto = ["¡Hola Venta Store! Quiero entregar mi usado en parte de pago.", "",
       `Equipo: ${elegido ? `${mod.value} ${cap.value}`.trim() : "(escribí tu modelo y capacidad)"}`,
-      `Swap o reacondicionado: ${si(chk.swap)}`, `Batería: ${bat.value ? bat.value + " %" : ""}`, `Estado: ${est.selectedOptions[0].text}`,
+      `Swap o reacondicionado: ${si(chk.swap)}`, `Batería: ${bat.value ? bat.value + " %" : ""}`, `Pantalla y cuerpo: ${est.selectedOptions[0].text}`,
       `Funciona todo: ${si(chk.funciona)} · Face ID: ${si(chk.faceid)}`, `Nunca reparado: ${si(chk.original)} · Sin iCloud: ${si(chk.icloud)} · Caja: ${si(chk.caja)}`,
       r.v ? `Valor estimado en el sitio: ${usd(r.v)}` : null, "", "¿Qué equipo me puedo llevar?"].filter(l => l !== null).join("\n");
     enviar.href = `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(texto)}`;

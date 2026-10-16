@@ -19,7 +19,7 @@
 <meta name="twitter:card" content="summary_large_image">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&family=Instrument+Sans:wght@400..700&display=swap">
-<link rel="stylesheet" href="/estilos.css?v=12">
+<link rel="stylesheet" href="/estilos.css?v=13">
 <script type="application/ld+json">
 {"@context":"https://schema.org","@type":"Store","name":"Venta Store","url":"https://ventastore.store/","logo":"https://ventastore.store/icono-180.png","image":"https://ventastore.store/compartir.png?v=2","telephone":"+54 9 3764 58-6667","email":"capital@ventastore.store","address":{"@type":"PostalAddress","addressLocality":"Posadas","addressRegion":"Misiones","addressCountry":"AR"},"openingHoursSpecification":[{"@type":"OpeningHoursSpecification","dayOfWeek":["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"],"opens":"09:00","closes":"18:00"}],"sameAs":["https://www.instagram.com/_ventastore_/"],"areaServed":"AR"}
 </script>
@@ -35,7 +35,7 @@
       <span><b>Venta</b> Store</span>
     </a>
     <nav class="menu" aria-label="Secciones">
-      <a href="#catalogo">Catálogo</a><a href="#como-comprar">Cómo comprar</a><a href="#cuotas">Cuotas</a><a href="#invertir">Invertí</a><a href="#preguntas">Preguntas</a>
+      <a href="#catalogo">Catálogo</a><a href="#como-comprar">Cómo comprar</a><a href="#cuotas">Cuotas</a><a href="#usados" id="navUsados" hidden>Tu usado</a><a href="#invertir">Invertí</a><a href="#preguntas">Preguntas</a>
     </nav>
     <button class="btn-pedido" type="button" data-abrir-pedido aria-label="Ver mi pedido">
       <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 7h12l-1.2 11.2a2 2 0 0 1-2 1.8H9.2a2 2 0 0 1-2-1.8L6 7Z"/><path d="M9 7V6a3 3 0 0 1 6 0v1"/></svg>
@@ -101,12 +101,30 @@
       <div class="usado">
         <h3>Tomamos tu iPhone usado</h3>
         <p id="uTexto">Lo tomamos en parte de pago. Mandanos modelo, capacidad y el estado de la batería, y te decimos cuánto vale.</p>
-        <form class="cotizador" id="cotizador" hidden>
-          <label>Modelo<select id="uModelo"></select></label>
-          <label>Capacidad<select id="uCapacidad"></select></label>
-          <label class="ancho-cot">Batería (%)<input id="uBateria" type="number" inputmode="numeric" min="50" max="100" placeholder="Ej.: 88"></label>
-          <label class="ancho-cot">Estado de la pantalla y el cuerpo<select id="uEstado"><option value="ok">Impecable, sin marcas</option><option value="detalles">Con rayones o marcas de uso</option><option value="trizado">Tapa trasera trizada</option><option value="pantalla">Pantalla trizada</option></select></label>
-          <fieldset class="checklist ancho-cot"><legend>Marcá lo que se cumple</legend>
+        <a class="btn sec-claro" id="uIr" href="https://wa.me/5493764586667?text=Hola%2C%20quiero%20entregar%20mi%20iPhone%20en%20parte%20de%20pago" target="_blank" rel="noopener">Cotizar mi usado</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="usados" id="usados" aria-labelledby="tUsados" hidden>
+    <div class="ancho">
+      <div class="usados-cab">
+        <p class="etiqueta">Parte de pago</p>
+        <h2 id="tUsados">Cotizá tu iPhone usado</h2>
+        <p>Completá los datos y mirá al instante cuánto te tomamos tu equipo. Lo usás como parte de pago de tu próximo iPhone.</p>
+      </div>
+      <div class="sim cot">
+        <form class="sim-controles" id="cotizador" onsubmit="return false">
+          <h3>Tu equipo</h3>
+          <div class="cot-fila">
+            <label class="campo-sim"><span>Modelo</span><select id="uModelo"></select></label>
+            <label class="campo-sim"><span>Capacidad</span><select id="uCapacidad"></select></label>
+          </div>
+          <div class="cot-fila">
+            <label class="campo-sim"><span>Batería (%)</span><input id="uBateria" type="number" inputmode="numeric" min="50" max="100" placeholder="Ej.: 88"></label>
+            <label class="campo-sim"><span>Pantalla y cuerpo</span><select id="uEstado"><option value="ok">Impecable</option><option value="detalles">Rayones o marcas</option><option value="trizado">Tapa trasera trizada</option><option value="pantalla">Pantalla trizada</option></select></label>
+          </div>
+          <fieldset class="checklist"><legend>Marcá lo que se cumple</legend>
             <label><input type="checkbox" id="cSwap"> Es Swap o reacondicionado (no lo compré nuevo y sellado)</label>
             <label><input type="checkbox" id="cFunciona" checked> Funciona todo: pantalla táctil, cámaras, audio y carga</label>
             <label><input type="checkbox" id="cFaceId" checked> Face ID (o Touch ID) funciona</label>
@@ -114,9 +132,13 @@
             <label><input type="checkbox" id="cIcloud" checked> Sin bloqueo de iCloud y liberado</label>
             <label><input type="checkbox" id="cCaja"> Tengo la caja</label>
           </fieldset>
-          <div class="cot-valor" id="uValor" aria-live="polite"></div>
         </form>
-        <a class="btn sec-claro" id="uEnviar" href="https://wa.me/5493764586667?text=Hola%2C%20quiero%20entregar%20mi%20iPhone%20en%20parte%20de%20pago" target="_blank" rel="noopener">Cotizar mi usado</a>
+        <div class="sim-resultado" aria-live="polite">
+          <div class="cot-valor" id="uValor"></div>
+          <ul class="cot-detalle" id="uDetalle"></ul>
+          <p class="cot-nota">Valor estimado, sujeto a revisión del equipo en persona. Lo descontamos del precio del equipo que te llevás.</p>
+          <a class="btn pri" id="uEnviar" href="#" target="_blank" rel="noopener">Elegí tu modelo</a>
+        </div>
       </div>
     </div>
   </section>
@@ -212,6 +234,6 @@
 </aside>
 <button class="barra-pedido" id="barraPedido" type="button" data-abrir-pedido hidden></button>
 
-<script src="/app.js?v=17" defer></script>
+<script src="/app.js?v=18" defer></script>
 </body>
 </html>

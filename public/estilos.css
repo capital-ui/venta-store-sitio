@@ -251,19 +251,29 @@ details p { padding: 0 20px 18px; color: var(--piedra); }
 .efectivo { font-size: 14px; font-weight: 700; color: #1F7A4A; margin-top: 2px; }
 .total s { display: block; font-size: 15px; font-weight: 600; color: var(--piedra); font-family: var(--texto); }
 .total small.ahorro { color: #1F7A4A; font-weight: 700; }
-/* Cotizador de usados */
-.cotizador { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 12px; margin: 16px 0 18px; }
-.cotizador label { display: grid; gap: 4px; font-size: 13px; font-weight: 600; color: #FCE8E1; }
-.cotizador select, .cotizador input { font: inherit; font-size: 15px; font-weight: 500; color: var(--selva); background: var(--blanco); border: 0; border-radius: 10px; padding: 10px 12px; min-height: 44px; width: 100%; }
-.cotizador select:disabled { opacity: .6; }
-.cot-valor { grid-column: 1 / -1; color: var(--blanco); }
-.cot-valor:empty { display: none; }
-.cot-valor span { display: block; font-size: 14px; color: #FCE8E1; }
-.cot-valor b { display: block; font-family: var(--titulo); font-size: 34px; font-weight: 800; letter-spacing: -.02em; line-height: 1.1; }
-.cot-valor small { display: block; font-size: 12.5px; color: #FCE8E1; }
-.ancho-cot { grid-column: 1 / -1; }
-.checklist { border: 0; margin: 4px 0 0; padding: 12px 14px; background: rgba(0,0,0,.14); border-radius: 12px; display: grid; gap: 8px; }
-.checklist legend { float: left; width: 100%; font-size: 13px; font-weight: 700; color: var(--blanco); margin-bottom: 2px; padding: 0; }
-.checklist label { display: flex; align-items: flex-start; gap: 10px; font-size: 14.5px; font-weight: 500; color: var(--blanco); line-height: 1.35; cursor: pointer; min-height: 28px; }
-.checklist input { width: 20px; height: 20px; min-height: 0; margin: 0; flex: none; accent-color: var(--selva); padding: 0; }
-@media (max-width: 420px) { .cotizador { grid-template-columns: 1fr; } }
+/* Cotizador de usados: sección propia, con el estilo del simulador de inversión */
+.usados { background: var(--niebla); padding: 60px 0; }
+.usados-cab p:not(.etiqueta) { font-size: 18px; color: var(--piedra); margin-top: 12px; max-width: 40em; }
+.usados-cab h2 { margin-top: 10px; }
+.cot { margin-top: 26px; grid-template-columns: 1.2fr 1fr; }
+.cot .sim-controles, .cot .sim-resultado { background: var(--selva); color: var(--blanco); }
+.cot .sim-resultado { justify-content: flex-start; }
+.cot-fila { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.cot select, .cot .campo-sim input { font: 600 17px var(--texto); color: var(--selva); background: var(--blanco); border: 0; border-radius: 14px; min-height: 52px; padding: 0 14px; width: 100%; }
+.cot select:disabled { opacity: .55; }
+.checklist { border: 0; margin: 0; padding: 14px 16px; background: var(--selva-2); border-radius: 14px; display: grid; gap: 10px; }
+.checklist legend { float: left; width: 100%; font-size: 13px; font-weight: 700; color: var(--claro-sobre-selva); margin-bottom: 2px; padding: 0; }
+.checklist label { display: flex; align-items: flex-start; gap: 10px; font-size: 15px; color: var(--blanco); line-height: 1.35; cursor: pointer; }
+.checklist input { width: 20px; height: 20px; margin: 1px 0 0; flex: none; accent-color: var(--tierra); }
+.cot-valor { background: var(--selva-2); border-radius: 16px; padding: 20px; }
+.cot-valor.con-precio { background: var(--tierra); }
+.cot-valor span { display: block; font-size: 15px; font-weight: 600; color: var(--claro-sobre-selva); }
+.cot-valor.con-precio span { color: #FCE8E1; }
+.cot-valor b { display: block; font-family: var(--titulo); font-size: clamp(40px, 6vw, 56px); font-weight: 800; letter-spacing: -.02em; line-height: 1.05; margin-top: 4px; font-variant-numeric: tabular-nums; }
+.cot-detalle { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.cot-detalle:empty { display: none; }
+.cot-detalle li { display: flex; justify-content: space-between; gap: 12px; font-size: 14.5px; color: var(--claro-sobre-selva); border-bottom: 1px solid rgba(255,255,255,.08); padding-bottom: 8px; }
+.cot-detalle b { color: var(--blanco); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.cot-nota { font-size: 13.5px; color: var(--claro-sobre-selva); }
+@media (max-width: 860px) { .cot { grid-template-columns: 1fr; } }
+@media (max-width: 420px) { .cot-fila { grid-template-columns: 1fr; } .usados { padding: 44px 0; } }
