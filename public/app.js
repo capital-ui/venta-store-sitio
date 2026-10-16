@@ -149,8 +149,8 @@ $("#buscar").addEventListener("input", ev => { texto = ev.target.value; pintar()
 ["#envio", "#nombre"].forEach(s => $(s).addEventListener("input", actualizarEnlace));
 $("#pago").addEventListener("change", pintarPedido);
 
-/* ---------- Simulador de inversión (6 % mensual en pesos, 3 % en dólares) ---------- */
-const TASA = { ARS: 0.06, USD: 0.03 }, MINIMO = { ARS: 3000000, USD: 2000 };
+/* ---------- Simulador de inversión (5 % mensual en pesos, 2,5 % en dólares) ---------- */
+const TASA = { ARS: 0.05, USD: 0.025 }, MINIMO = { ARS: 3000000, USD: 2000 };
 const RAPIDOS = { ARS: [3000000, 5000000, 10000000, 20000000], USD: [2000, 5000, 10000, 20000] };
 const sim = { moneda: "ARS", plazo: 12, modo: "cobro", monto: 5000000 };
 const fmt = (n, m = sim.moneda) => (m === "ARS" ? pesos(n) : usd(n));
@@ -175,7 +175,7 @@ function simular() {
   $("#simCifras").innerHTML = cifras.map(([e, v], i) => `<div class="${i === 1 ? "destacada" : ""}"><span>${e}</span><b>${v}</b></div>`).join("");
   const tope = base + ganancia || 1;
   $("#simGrafico").innerHTML = meses.map((x, k) => `<div class="barra" title="Mes ${k + 1}: ${fmt(x.capital + x.ganancia)}"><i class="gan" style="height:${(x.ganancia / tope) * 100}%"></i><i class="cap" style="height:${(x.capital / tope) * 100}%"></i>${(k + 1) % (N > 12 ? 6 : 3) === 0 ? `<em>${k + 1}</em>` : ""}</div>`).join("");
-  const texto = `Hola, quiero invertir en Venta Store.\nMonto: ${fmt(base)}\nPlazo: ${N} meses\n${modo === "cobro" ? "Quiero cobrar la ganancia cada mes" : "Quiero reinvertir la ganancia"}\nTasa: ${Math.round(t * 100)} % mensual en ${m === "ARS" ? "pesos" : "dólares"}`;
+  const texto = `Hola, quiero invertir en Venta Store.\nMonto: ${fmt(base)}\nPlazo: ${N} meses\n${modo === "cobro" ? "Quiero cobrar la ganancia cada mes" : "Quiero reinvertir la ganancia"}\nTasa: ${(t * 100).toLocaleString("es-AR")} % mensual en ${m === "ARS" ? "pesos" : "dólares"}`;
   const wa = $("#simWa"); wa.textContent = bajo ? "Quiero invertir" : `Quiero invertir ${fmt(base)}`;
   wa.href = `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(texto)}`;
 }
