@@ -104,8 +104,10 @@
         <form class="cotizador" id="cotizador" hidden>
           <label>Modelo<select id="uModelo"></select></label>
           <label>Capacidad<select id="uCapacidad"></select></label>
+          <label>¿Cómo lo compraste?<select id="uOrigen"><option value="original">Nuevo, sellado</option><option value="swap">Swap o reacondicionado</option></select></label>
+          <label>¿Tenés la caja?<select id="uCaja"><option value="si">Sí</option><option value="no">No</option></select></label>
           <label>Batería (%)<input id="uBateria" type="number" inputmode="numeric" min="50" max="100" placeholder="Ej.: 88"></label>
-          <label>Estado<select id="uEstado"><option>Impecable</option><option>Con detalles de uso</option><option>Pantalla o batería cambiada</option><option>Roto o con fallas</option></select></label>
+          <label>Estado<select id="uEstado"><option value="ok">Impecable</option><option value="detalles">Con rayones o detalles</option><option value="trizado">Pantalla o tapa trizada</option><option value="falla">No funciona bien</option></select></label>
           <div class="cot-valor" id="uValor" aria-live="polite"></div>
         </form>
         <a class="btn sec-claro" id="uEnviar" href="https://wa.me/5493764586667?text=Hola%2C%20quiero%20entregar%20mi%20iPhone%20en%20parte%20de%20pago" target="_blank" rel="noopener">Cotizar mi usado</a>
@@ -204,6 +206,6 @@
 </aside>
 <button class="barra-pedido" id="barraPedido" type="button" data-abrir-pedido hidden></button>
 
-<script src="/app.js?v=12" defer></script>
+<script src="/app.js?v=13" defer></script>
 </body>
 </html>

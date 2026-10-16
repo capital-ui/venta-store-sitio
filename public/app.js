@@ -191,34 +191,49 @@ document.querySelector(".sim-controles").addEventListener("click", ev => {
 ponerMonto(sim.monto);
 iniciar();
 
-/* ---------- Cotizador de usados (valores de la pestaña "Usados" de la planilla) ---------- */
+/* ---------- Cotizador de usados (valores de la pestaña "Usados" de la planilla) ----------
+   Nuevo/sellado + caja + batería 90-100 %: se compara con Garantía Apple (costo − 100).
+   Si no: se compara con Swap (costo − 100; con batería menor a 85 %, costo − 120).
+   Rayones o detalles: −20. Pantalla o tapa trizada: −25. Si no funciona bien, se cotiza en persona. */
+const USADO_BATERIA_BAJA = 20, USADO_DETALLES = 20, USADO_TRIZADO = 25;
 (async () => {
   let lista = [];
   try { lista = (await (await fetch("/api/usados")).json()).usados || []; } catch {}
   if (!lista.length) return; // sin tabla queda el botón de WhatsApp de siempre
-  const form = $("#cotizador"), mod = $("#uModelo"), cap = $("#uCapacidad"), bat = $("#uBateria"), est = $("#uEstado"), valor = $("#uValor"), enviar = $("#uEnviar");
+  const form = $("#cotizador"), mod = $("#uModelo"), cap = $("#uCapacidad"), ori = $("#uOrigen"), caja = $("#uCaja"), bat = $("#uBateria"), est = $("#uEstado"), valor = $("#uValor"), enviar = $("#uEnviar");
   const modelos = [...new Set(lista.map(u => u.modelo))];
   mod.innerHTML = '<option value="">Elegí tu modelo</option>' + modelos.map(m => `<option>${esc(m)}</option>`).join("") + '<option value="otro">Otro modelo</option>';
-  form.hidden = false; $("#uTexto").textContent = "Lo tomamos en parte de pago. Elegí tu equipo y mirá cuánto vale.";
+  form.hidden = false; $("#uTexto").textContent = "Lo tomamos en parte de pago. Completá los datos y mirá cuánto vale.";
   const capacidades = () => {
     const c = lista.filter(u => u.modelo === mod.value);
     cap.innerHTML = c.length ? c.map(u => `<option>${esc(u.capacidad)}</option>`).join("") : '<option value="">—</option>';
     cap.disabled = !c.length;
   };
+  const cotizar = () => {
+    const u = lista.find(x => x.modelo === mod.value && x.capacidad === cap.value), b = Number(bat.value);
+    if (!u || est.value === "falla" || !b) return null;
+    let v = ori.value === "original" && caja.value === "si" && b >= 90 && u.original ? u.original
+      : u.swap ? u.swap - (b < 85 ? USADO_BATERIA_BAJA : 0) : null;
+    if (v == null) return null;
+    v -= est.value === "trizado" ? USADO_TRIZADO : est.value === "detalles" ? USADO_DETALLES : 0;
+    return v > 0 ? v : null;
+  };
   const calcular = () => {
-    const u = lista.find(x => x.modelo === mod.value && x.capacidad === cap.value);
-    const malo = est.value === "Roto o con fallas";
+    const v = cotizar(), elegido = mod.value && mod.value !== "otro";
     valor.innerHTML = !mod.value ? "" : mod.value === "otro" ? "<span>Contanos qué equipo es y te lo cotizamos.</span>"
-      : u && !malo ? `<span>Te lo tomamos en aprox.</span><b>${usd(u.toma)}</b><small>en parte de pago · valor estimado, sujeto a revisión del equipo</small>`
+      : est.value === "falla" ? "<span>Lo tenemos que ver para cotizarlo.</span>"
+      : !bat.value ? "<span>Poné el % de batería para ver cuánto vale.</span>"
+      : v ? `<span>Te lo tomamos en aprox.</span><b>${usd(v)}</b><small>en parte de pago · valor estimado, sujeto a revisión del equipo</small>`
       : "<span>Lo tenemos que ver para cotizarlo.</span>";
-    const equipo = mod.value === "otro" ? "(escribí tu modelo y capacidad)" : `${mod.value} ${cap.value}`.trim();
     const texto = ["¡Hola Venta Store! Quiero entregar mi usado en parte de pago.", "",
-      `Equipo: ${mod.value ? equipo : ""}`, `Batería: ${bat.value ? bat.value + " %" : ""}`, `Estado: ${est.value}`,
-      u && !malo ? `Valor estimado en el sitio: ${usd(u.toma)}` : "", "", "¿Qué equipo me puedo llevar?"].filter((l, i, a) => l !== "" || (a[i - 1] && a[i - 1] !== "")).join("\n");
+      `Equipo: ${elegido ? `${mod.value} ${cap.value}`.trim() : "(escribí tu modelo y capacidad)"}`,
+      `Lo compré: ${ori.selectedOptions[0].text}`, `Caja: ${caja.selectedOptions[0].text}`,
+      `Batería: ${bat.value ? bat.value + " %" : ""}`, `Estado: ${est.selectedOptions[0].text}`,
+      v ? `Valor estimado en el sitio: ${usd(v)}` : null, "", "¿Qué equipo me puedo llevar?"].filter(l => l !== null).join("\n");
     enviar.href = `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(texto)}`;
-    enviar.textContent = u && !malo ? "Quiero entregarlo" : "Cotizar mi usado";
+    enviar.textContent = v ? "Quiero entregarlo" : "Cotizar mi usado";
   };
   mod.addEventListener("change", () => { capacidades(); calcular(); });
-  [cap, est].forEach(e => e.addEventListener("change", calcular)); bat.addEventListener("input", calcular);
+  [cap, ori, caja, est].forEach(e => e.addEventListener("change", calcular)); bat.addEventListener("input", calcular);
   capacidades(); calcular();
 })();

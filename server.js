@@ -138,11 +138,18 @@ async function usados() {
       if (prueba) texto = fs.readFileSync(prueba, "utf8");
       else { const r = await fetch(`https://docs.google.com/spreadsheets/d/${encodeURIComponent(id)}/gviz/tq?tqx=out:csv&sheet=Usados`, { signal: AbortSignal.timeout(10000) }); if (r.ok) texto = await r.text(); }
       const filas = csv(texto);
-      // Si la pestaña no existe, Google devuelve la primera (productos): sin columna "Costo" no se usa
+      // Si la pestaña no existe, Google devuelve la primera (productos): sin columna "Costo" no se usa.
+      // Columnas: Modelo · Capacidad · Costo Garantía Apple · Costo Swap (con una sola columna "Costo", vale para los dos)
       const cab = (filas[0] || []).map(c => String(c).toLowerCase());
-      const iM = cab.findIndex(c => /modelo|nombre|equipo/.test(c)), iC = cab.findIndex(c => /capacidad|gb/.test(c)), iP = cab.findIndex(c => /costo/.test(c));
-      if (iM >= 0 && iP >= 0) lista = filas.slice(1).map(f => ({ modelo: prolijo({ nombre: f[iM] || "", descripcion: "", categoria: "", usd: 0, imagen: "" }).nombre, capacidad: iC >= 0 ? String(f[iC] || "").trim().replace(/\s*(gb|tb)$/i, (_, u) => " " + u.toUpperCase()) : "", toma: Math.round(numero(f[iP]) - TOMA_MENOS) }))
-        .filter(u => u.modelo && u.toma > 0);
+      const iM = cab.findIndex(c => /modelo|nombre|equipo/.test(c)), iC = cab.findIndex(c => /capacidad|gb/.test(c));
+      const iG = cab.findIndex(c => /costo/.test(c) && /garant|apple|sellad|nuevo/.test(c)), iS = cab.findIndex(c => /costo/.test(c) && /swap/.test(c));
+      const iP = cab.findIndex(c => /costo/.test(c));
+      const toma = v => { const n = Math.round(numero(v) - TOMA_MENOS); return n > 0 ? n : null; };
+      if (iM >= 0 && iP >= 0) lista = filas.slice(1).map(f => ({
+          modelo: prolijo({ nombre: f[iM] || "", descripcion: "", categoria: "", usd: 0, imagen: "" }).nombre,
+          capacidad: iC >= 0 ? String(f[iC] || "").trim().replace(/\s*(gb|tb)$/i, (_, u) => " " + u.toUpperCase()) : "",
+          original: toma(f[iG >= 0 ? iG : iP]), swap: toma(f[iS >= 0 ? iS : iP]) }))
+        .filter(u => u.modelo && (u.original || u.swap));
     }
   } catch (e) { console.error("No se pudo leer Usados:", e.message); if (cacheUsados.datos) return cacheUsados.datos; }
   cacheUsados = { hasta: Date.now() + MINUTOS * 60e3, datos: { usados: lista } };
