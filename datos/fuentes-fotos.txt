@@ -40,3 +40,4 @@ iphone-15-pro-max A iphone-15-pro-finish-select-202309-6-7inch-bluetitanium
 iphone-16-pro-max A iphone-16-pro-finish-select-202409-6-9inch-blacktitanium
 iphone-17-pro-max A iphone-17-pro-finish-select-202509-6-3inch-deepblue
 rayban-meta U https://www.meta.com/ai-glasses/ray-ban-meta-wayfarer-shiny-black-green-gen-2/ (vista 3/4)
+iphone-15-pro-2 A iphone-15-pro-finish-select-202309-6-1inch-whitetitanium

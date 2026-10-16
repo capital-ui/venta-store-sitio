@@ -195,6 +195,13 @@ async function catalogo() {
     base = deFormatoViejo(JSON.parse(fs.readFileSync(RESPALDO, "utf8")));
   }
   const datos = { dolar: base.dolar || numero(process.env.DOLAR) || 0, actualizado: new Date().toISOString(), productos: base.productos.filter(p => p.usd > 0).map(prolijo) };
+  // Mismo modelo en dos tarjetas (por ej. 15 Pro de 128 y de 256): la segunda usa otro color si hay foto ("-2", "-3")
+  const vistas = {};
+  for (const p of datos.productos) {
+    const m = /^\/productos\/([a-z0-9-]+)\.webp/.exec(p.imagen || ""); if (!m) continue;
+    const n = vistas[m[1]] = (vistas[m[1]] || 0) + 1;
+    if (n > 1 && FOTOS.has(m[1] + "-" + n)) p.imagen = "/productos/" + m[1] + "-" + n + ".webp?v=1";
+  }
   // Un solo Apple Watch en rosa para que se vea la opción (el primer Series 11, o el primer Series); si la planilla dice "rosa", manda la planilla
   const series = datos.productos.filter(p => /^Apple Watch Series/.test(p.nombre));
   if (series.length && !series.some(p => /watch-series-pink/.test(p.imagen))) {
