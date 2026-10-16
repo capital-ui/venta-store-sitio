@@ -107,7 +107,7 @@ function datosEstructurados() {
   s.textContent = JSON.stringify({ "@context": "https://schema.org", "@type": "ItemList", itemListElement: datos.productos.slice(0, 60).map((p, i) => ({ "@type": "ListItem", position: i + 1,
     item: { "@type": "Product", name: [p.nombre, p.detalle].filter(Boolean).join(" "), image: p.imagen || undefined, brand: { "@type": "Brand", name: /playstation/i.test(p.nombre) ? "Sony" : /nintendo/i.test(p.nombre) ? "Nintendo" : "Apple" },
       itemCondition: p.condicion === "Garantía Apple" ? "https://schema.org/NewCondition" : "https://schema.org/RefurbishedCondition",
-      offers: { "@type": "Offer", price: p.usd, priceCurrency: "USD", availability: "https://schema.org/InStock", url: "https://ventastore.store/#catalogo" } } })) });
+      offers: { "@type": "Offer", price: p.usd, priceCurrency: "USD", availability: "https://schema.org/InStock", url: "https://www.ventastore.store/#catalogo" } } })) });
   document.head.appendChild(s);
 }
 
