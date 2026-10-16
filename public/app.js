@@ -208,6 +208,14 @@ const USADO_BATERIA_MEDIA = 15, USADO_BATERIA_BAJA = 30, USADO_DETALLES = 30, US
   $("#uTexto").textContent = "Lo tomamos en parte de pago. Cotizalo acá mismo en un minuto.";
   const ir = $("#uIr"); ir.href = "#usados"; ir.removeAttribute("target"); ir.textContent = "Cotizar mi usado";
   const mod = $("#uModelo"), cap = $("#uCapacidad"), bat = $("#uBateria"), est = $("#uEstado"), valor = $("#uValor"), detalle = $("#uDetalle"), enviar = $("#uEnviar");
+  const llevarBox = $("#uLlevarBox"), llevar = $("#uLlevar"), dif = $("#uDif");
+  // Equipos para llevarse: los del catálogo (se cargan aparte; se llenan cuando están)
+  const nombreProd = p => [p.nombre, p.detalle, p.condicion].filter(Boolean).join(" · ");
+  const llenarLlevar = () => {
+    if (!datos.productos.length || llevar.options.length) return;
+    const grupos = CATEGORIAS.filter(([id]) => id !== "todos").map(([id, et]) => [et, datos.productos.filter(p => p.categoria === id)]).filter(([, l]) => l.length);
+    llevar.innerHTML = '<option value="">Elegí el equipo</option>' + grupos.map(([et, l]) => `<optgroup label="${esc(et)}">${l.map(p => `<option value="${p.id}">${esc(nombreProd(p))} — ${usd(p.usd)}</option>`).join("")}</optgroup>`).join("");
+  };
   const chk = { swap: $("#cSwap"), funciona: $("#cFunciona"), faceid: $("#cFaceId"), original: $("#cOriginal"), icloud: $("#cIcloud"), caja: $("#cCaja") };
   const modelos = [...new Set(lista.map(u => u.modelo))];
   mod.innerHTML = '<option value="">Elegí tu modelo</option>' + modelos.map(m => `<option>${esc(m)}</option>`).join("") + '<option value="otro">Otro modelo</option>';
@@ -244,18 +252,30 @@ const USADO_BATERIA_MEDIA = 15, USADO_BATERIA_BAJA = 30, USADO_DETALLES = 30, US
       : `<span>${!mod.value ? "Elegí tu modelo para ver cuánto vale." : mod.value === "otro" ? "Contanos qué equipo es y te lo cotizamos." : r.aviso}</span>`;
     valor.classList.toggle("con-precio", !!r.v);
     detalle.innerHTML = r.v ? r.lineas.map(([t, m]) => `<li><span>${esc(t)}</span><b>${m}</b></li>`).join("") : "";
+    // Equipo que se lleva y diferencia a poner (sobre el precio publicado)
+    llenarLlevar(); llevarBox.hidden = !r.v;
+    const prod = r.v && llevar.value !== "" ? datos.productos[Number(llevar.value)] : null;
+    const resta = prod ? prod.usd - r.v : 0;
+    dif.innerHTML = !prod ? "" : resta > 0
+      ? `<span>Ponés de diferencia</span><b>${usd(resta)}</b>${datos.dolar > 0 ? `<small>${pesos(resta * datos.dolar)} al dólar de hoy</small>` : ""}${sellado(prod) && resta > DESC_EFECTIVO ? `<small class="ahorro">En efectivo: ${usd(resta - DESC_EFECTIVO)}</small>` : ""}<small>También en cuotas sin tarjeta, en Posadas</small>`
+      : `<span>Tu usado cubre el equipo.</span><small>Escribinos y lo confirmamos.</small>`;
     const si = c => c.checked ? "Sí" : "No";
     const texto = ["¡Hola Venta Store! Quiero entregar mi usado en parte de pago.", "",
       `Equipo: ${elegido ? `${mod.value} ${cap.value}`.trim() : "(escribí tu modelo y capacidad)"}`,
       `Swap o reacondicionado: ${si(chk.swap)}`, `Batería: ${bat.value ? bat.value + " %" : ""}`, `Pantalla y cuerpo: ${est.selectedOptions[0].text}`,
       `Funciona todo: ${si(chk.funciona)} · Face ID: ${si(chk.faceid)}`, `Nunca reparado: ${si(chk.original)} · Sin iCloud: ${si(chk.icloud)} · Caja: ${si(chk.caja)}`,
-      r.v ? `Valor estimado en el sitio: ${usd(r.v)}` : null, "", "¿Qué equipo me puedo llevar?"].filter(l => l !== null).join("\n");
+      r.v ? `Valor estimado en el sitio: ${usd(r.v)}` : null,
+      prod ? "" : null, prod ? `Me quiero llevar: *${nombreProd(prod)}* (${usd(prod.usd)})` : null,
+      prod && resta > 0 ? `Diferencia a poner: ${usd(resta)}` : null,
+      "", prod ? "¿Me confirman disponibilidad? ¡Gracias!" : "¿Qué equipo me puedo llevar?"].filter(l => l !== null).join("\n");
     enviar.href = `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(texto)}`;
-    enviar.textContent = r.v ? "Quiero entregarlo" : mod.value ? "Consultar por WhatsApp" : "Elegí tu modelo";
+    // Con precio, el botón aparece recién cuando elige qué se lleva; sin precio, queda para consultar
+    enviar.hidden = (!!r.v && !prod) || (elegido && !bat.value && chk.icloud.checked && chk.funciona.checked && chk.faceid.checked && est.value !== "pantalla");
+    enviar.textContent = r.v ? "Enviar por WhatsApp" : mod.value ? "Consultar por WhatsApp" : "Elegí tu modelo";
   };
   // Sin modelo elegido, el botón lleva al formulario en vez de abrir WhatsApp
   enviar.addEventListener("click", e => { if (!mod.value) { e.preventDefault(); mod.focus(); mod.scrollIntoView({ block: "center", behavior: "smooth" }); } });
   mod.addEventListener("change", () => { capacidades(); calcular(); });
-  [cap, est, ...Object.values(chk)].forEach(e => e.addEventListener("change", calcular)); bat.addEventListener("input", calcular);
+  [cap, est, llevar, ...Object.values(chk)].forEach(e => e.addEventListener("change", calcular)); bat.addEventListener("input", calcular);
   capacidades(); calcular();
 })();
