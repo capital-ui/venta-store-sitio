@@ -52,7 +52,16 @@ function deFormatoViejo(lista) {
 
 /* ---------- Fotos propias (public/productos): cuadradas, fondo blanco; mandan sobre la de la planilla ---------- */
 const FOTOS = new Set((() => { try { return fs.readdirSync(path.join(__dirname, "public", "productos")); } catch { return []; } })().map(f => f.replace(/\.webp$/, "")));
-function fotoDe(nombre) {
+// Colores que se reconocen en la descripción (lo que se muestra → nombre de la foto, si hay una de ese color)
+const COLORES = [
+  [/\bburgundy\b|\bbord[oó]\b|\bburdeos\b/, "Burgundy", "burgundy"], [/\bglacier\b/, "Glacier", "glacier"],
+  [/\bsilver\b|\bplata\b|\bplateado\b/, "Plata", "silver"], [/\bnegro\b|\bblack\b/, "Negro", "black"],
+  [/\bblanco\b|\bwhite\b/, "Blanco", "white"], [/\bazul\b|\bblue\b/, "Azul", "blue"], [/\brosa\b|\bpink\b/, "Rosa", "pink"],
+  [/\bverde\b|\bgreen\b/, "Verde", "green"], [/\bnaranja\b|\borange\b/, "Naranja", "orange"], [/\blavanda\b|\blavender\b/, "Lavanda", "lavender"],
+  [/\bvioleta\b|\bpurple\b/, "Violeta", "purple"], [/\bdorado\b|\bgold\b/, "Dorado", "gold"], [/\bgris\b|\bgr[ae]y\b/, "Gris", "gray"],
+  [/\bnatural\b/, "Natural", "natural"], [/\bdesert\b|\bdesierto\b/, "Desierto", "desert"], [/\bmidnight\b|\bmedianoche\b/, "Medianoche", "midnight"],
+];
+function fotoDe(nombre, color) {
   const n = nombre.toLowerCase(); let k = null;
   const ip = n.match(/iphone\s*(\d+)\s*(e)?\b/);
   if (/iphone/.test(n) && /\bair\b/.test(n)) k = "iphone-air";
@@ -61,41 +70,57 @@ function fotoDe(nombre) {
   else if (/macbook/.test(n)) k = /pro/.test(n) ? "macbook-pro" : /neo/.test(n) ? "macbook-neo" : "macbook-air";
   else if (/watch/.test(n)) k = /ultra/.test(n) ? "watch-ultra" : /\bse\b/.test(n) ? "watch-se" : "watch-series";
   else if (/airtag/.test(n)) k = "airtag";
+  else if (/airpods/.test(n)) k = "airpods-pro-3";
   else if (/playstation|ps5/.test(n)) k = "ps5";
   else if (/switch 2/.test(n)) k = "switch-2";
+  if (k && color && FOTOS.has(k + "-" + color)) k += "-" + color;
   return k && FOTOS.has(k) ? "/productos/" + k + ".webp?v=1" : null;
 }
 
 /* ---------- Nombres prolijos y datos de cada equipo (la planilla queda como está) ---------- */
-const CATEGORIAS = { celulares: "iphone", ipad: "ipad", macbook: "mac", watch: "watch", consolas: "consolas" };
+const CATEGORIAS = { celulares: "iphone", iphone: "iphone", ipad: "ipad", macbook: "mac", mac: "mac", watch: "watch", consolas: "consolas", airpods: "accesorios", airtag: "accesorios", accesorios: "accesorios" };
+const PALABRAS = { pro: "Pro", max: "Max", air: "Air", neo: "Neo", ultra: "Ultra", mini: "Mini", plus: "Plus", se: "SE" };
 function prolijo(p) {
   let nombre = String(p.nombre).trim(), desc = String(p.descripcion).trim().replace(/\.$/, "");
   const cpo = /\bcpo\b/i.test(nombre) || /\bcpo\b/i.test(desc);
   nombre = nombre.replace(/\bcpo\b/ig, "").replace(/\s+/g, " ").trim()
-    .replace(/^ipad/i, "iPad").replace(/^macbook/i, "MacBook").replace(/apple wach/i, "Apple Watch").replace(/^ps5$/i, "PlayStation 5")
-    .replace(/^airtags?$/i, "AirTag").replace(/iphone (\d+) e\b/i, "iPhone $1e").replace(/^(\d+ pro( max)?)$/i, "iPhone $1").replace(/^iphone/i, "iPhone");
-  const gb = (desc.match(/(\d+)\s*(gb|tb)\b(?!\s*ram)/i) || [])[0];
-  const ram = (desc.match(/(\d+)\s*gb\s*ram/i) || [])[1];
+    .replace(/^ipad/i, "iPad").replace(/^macbook/i, "MacBook").replace(/apple wach/i, "Apple Watch").replace(/^apple watch/i, "Apple Watch").replace(/^ps5$/i, "PlayStation 5")
+    .replace(/^airtags?$/i, "AirTag").replace(/^airpods/i, "AirPods").replace(/iphone (\d+) e\b/i, "iPhone $1e").replace(/^(\d+ pro( max)?)$/i, "iPhone $1").replace(/^iphone/i, "iPhone")
+    .replace(/\b(pro|max|air|neo|ultra|mini|plus|se)\b/gi, w => PALABRAS[w.toLowerCase()]);
+  // El chip puede venir en el nombre ("iPad Air 11 M4") o en la descripción
+  let chip = (nombre.match(/\s(m\d)$/i) || [])[1];
+  if (chip) nombre = nombre.replace(/\s(m\d)$/i, ""); else chip = (desc.match(/\b(m\d)\b/i) || [])[1];
+  // Memorias: con "RAM" en la descripción, la menor es la RAM y la mayor el almacenamiento
+  const tam = [...desc.matchAll(/(\d+)\s*(gb|tb)\b/gi)].map(m => ({ txt: m[1] + " " + m[2].toUpperCase(), gb: +m[1] * (/tb/i.test(m[2]) ? 1024 : 1) }));
+  let gb, ram;
+  if (/\bram\b/i.test(desc) && tam.length >= 2) { const o = [...tam].sort((a, b) => a.gb - b.gb); ram = o[0].txt; gb = o[o.length - 1].txt; }
+  else { const r = desc.match(/(\d+)\s*gb\s*ram/i); if (r) ram = r[1] + " GB"; gb = (tam.find(t => !r || t.gb !== +r[1]) || {}).txt; }
   const bateria = (desc.match(/(\d+)%\s*bater/i) || [])[1];
-  const pulgadas = /inch/i.test(desc) ? (nombre.match(/\s(1\d)$/) || [])[1] : null;
-  const chip = (desc.match(/\b(m\d)\b/i) || [])[1];
+  const conPulgadas = /^(iPad|MacBook)/.test(nombre) && (/inch/i.test(desc) || chip || /\b(air|pro|neo)\b/i.test(nombre));
+  const pulgadas = conPulgadas ? (nombre.match(/\s(1\d)$/) || [])[1] : null;
+  const dl = desc.toLowerCase(), col = COLORES.find(c => c[0].test(dl));
   let condicion = /swap/i.test(desc) ? "Swap" : cpo ? "CPO" : /garant[ií]a apple/i.test(desc) ? "Garantía Apple" : "";
   if (/^nintendo$/i.test(nombre) && /switch 2/i.test(desc)) nombre = "Nintendo Switch 2";
   let detalle = [];
+  const mm = [...desc.matchAll(/(\d+)\s*mm\b/gi)].map(m => m[1]);
   if (/^apple watch$/i.test(nombre)) { const m = desc.replace(/generacion/i, "generación").replace(/^se\b/i, "SE").replace(/^s(\d+)/i, "Series $1").replace(/\s*(\d+)\s*mm$/i, " · $1 mm"); nombre = "Apple Watch " + m.split(" · ")[0]; detalle.push(...m.split(" · ").slice(1)); }
-  else {
+  else if (/^apple watch/i.test(nombre)) {
+    nombre = nombre.replace(/\bS(\d+)\b/i, "Series $1").replace(/\b(\d+)\s*generaci[oó]n\b/i, "$1.ª generación");
+    if (mm.length) detalle.push(mm.join(" o ") + " mm");
+  } else {
     if (pulgadas) detalle.push(pulgadas + "″");
     if (chip) detalle.push("Chip " + chip.toUpperCase());
-    if (ram) detalle.push(ram + " GB RAM");
-    if (gb) detalle.push(gb.replace(/\s*(gb|tb)/i, (_, u) => " " + u.toUpperCase()));
+    if (ram) detalle.push(ram + " RAM");
+    if (gb) detalle.push(gb);
     if (bateria) detalle.push("Batería " + bateria + "%");
     if (/digital/i.test(desc)) detalle.push("Edición digital");
-    if (/x4/i.test(desc)) detalle.push("Pack de 4");
+    if (/x4|4\s*pack|pack\s*(de\s*)?4/i.test(desc)) detalle.push("Pack de 4");
     if (/6ta generacion/i.test(nombre)) { nombre = nombre.replace(/6ta generacion/i, "").trim(); detalle.unshift("6.ª generación"); }
   }
+  if (col) detalle.push(col[1]);
   if (pulgadas) nombre = nombre.replace(/\s1\d$/, "") + " " + pulgadas;
-  const categoria = /airtag/i.test(nombre) ? "accesorios" : CATEGORIAS[p.categoria] || "otros";
-  return { nombre, detalle: detalle.join(" · "), condicion, categoria, usd: p.usd, imagen: fotoDe(nombre) || p.imagen, conAccesorios: categoria === "iphone" };
+  const categoria = /airtag|airpods/i.test(nombre) ? "accesorios" : CATEGORIAS[p.categoria] || "otros";
+  return { nombre, detalle: detalle.join(" · "), condicion, categoria, usd: p.usd, imagen: fotoDe(nombre, col && col[2]) || p.imagen, conAccesorios: categoria === "iphone" };
 }
 
 async function catalogo() {

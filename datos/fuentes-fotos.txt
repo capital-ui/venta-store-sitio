@@ -27,3 +27,8 @@ watch-ultra A ultra-case-unselect-gallery-1-202609
 airtag A airtag-4pack-select-202104
 ps5 U https://gmedia.playstation.com/is/image/SIEPDC/ps5-slim-digital-edition-right-image-block-01-en-24jun24?$1600px$
 switch-2 U https://assets.nintendo.com/image/upload/b_white/f_png/q_auto/w_1400/ncom/My%20Nintendo%20Store/EN-US/Nintendo%20Switch%202/Hardware/123669-nintendo-switch-2-docked-2000x2000
+iphone-18-pro-black A iphone-18-pro-finish-select-black-202609
+iphone-18-pro-burgundy A iphone-18-pro-finish-select-burgundy-202609
+iphone-18-pro-glacier A iphone-18-pro-finish-select-glacier-202609
+iphone-18-pro-silver A iphone-18-pro-finish-select-silver-202609
+airpods-pro-3 A airpods-pro-3-hero-select-202509
