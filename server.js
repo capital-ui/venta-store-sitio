@@ -69,8 +69,6 @@ function fotoDe(nombre, color) {
   else if (/ipad/.test(n)) k = /air/.test(n) ? "ipad-air" : /pro/.test(n) ? "ipad-pro" : "ipad";
   else if (/macbook/.test(n)) k = /pro/.test(n) ? "macbook-pro" : /neo/.test(n) ? "macbook-neo" : "macbook-air";
   else if (/watch/.test(n)) k = /ultra/.test(n) ? "watch-ultra" : /\bse\b/.test(n) ? "watch-se" : "watch-series";
-  // Los Series se muestran en rosa (oro rosa con malla rosa), salvo que la planilla diga otro color
-  if (k === "watch-series" && !color) color = "pink";
   else if (/airtag/.test(n)) k = "airtag";
   else if (/airpods/.test(n)) k = "airpods-pro-3";
   else if (/playstation|ps5/.test(n)) k = "ps5";
@@ -138,6 +136,12 @@ async function catalogo() {
     base = deFormatoViejo(JSON.parse(fs.readFileSync(RESPALDO, "utf8")));
   }
   const datos = { dolar: base.dolar || numero(process.env.DOLAR) || 0, actualizado: new Date().toISOString(), productos: base.productos.filter(p => p.usd > 0).map(prolijo) };
+  // Un solo Apple Watch en rosa para que se vea la opción (el primer Series 11, o el primer Series); si la planilla dice "rosa", manda la planilla
+  const series = datos.productos.filter(p => /^Apple Watch Series/.test(p.nombre));
+  if (series.length && !series.some(p => /watch-series-pink/.test(p.imagen))) {
+    const uno = series.find(p => /Series 11/.test(p.nombre) && /^\/productos\/watch-series\.webp/.test(p.imagen)) || series.find(p => /^\/productos\/watch-series\.webp/.test(p.imagen));
+    if (uno && FOTOS.has("watch-series-pink")) uno.imagen = "/productos/watch-series-pink.webp?v=1";
+  }
   cache = { hasta: Date.now() + MINUTOS * 60e3, datos };
   return datos;
 }
