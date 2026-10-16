@@ -97,6 +97,9 @@ p { margin: 0; }
 .pill.cpo { background: #E3ECE7; color: #1B5E45; }
 .pill.apple { background: var(--selva); color: var(--blanco); }
 .leyenda { margin-top: 22px; font-size: 14px; color: var(--piedra); display: flex; flex-wrap: wrap; gap: 6px 10px; align-items: center; }
+.a-pedido { margin-top: 18px; background: var(--blanco); border: 1px solid var(--linea); border-radius: 20px; padding: 20px 22px; display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+.a-pedido b { display: block; font-family: var(--titulo); font-size: 20px; font-weight: 800; }
+.a-pedido span { display: block; color: var(--piedra); font-size: 15px; margin-top: 2px; }
 .leyenda .pill { margin-left: 10px; }
 .leyenda .pill:first-child { margin-left: 0; }
 .sin-resultados { grid-column: 1 / -1; background: var(--blanco); border: 1px dashed var(--linea); border-radius: 20px; padding: 28px; text-align: center; color: var(--piedra); }
