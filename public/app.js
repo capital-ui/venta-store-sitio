@@ -27,7 +27,7 @@ async function iniciar() {
     $("#catalogoSub").textContent = `${datos.productos.length} equipos. Precios en dólares y en pesos al dólar de hoy ($${miles(datos.dolar)}).`;
   }
   // Lo que quedó en el pedido se actualiza con los precios de hoy
-  pedido = pedido.map(x => { const p = datos.productos.find(q => q.clave === x.clave); return p ? { ...x, usd: p.usd, imagen: p.imagen } : null; }).filter(Boolean);
+  pedido = pedido.map(x => { const p = datos.productos.find(q => q.clave === x.clave); return p ? { ...x, usd: p.usd, imagen: p.imagen, consultarColor: p.consultarColor } : null; }).filter(Boolean);
   pintarFiltros(); pintar(); pintarPedido(); datosEstructurados();
 }
 
@@ -46,6 +46,7 @@ function tarjeta(p) {
     <div class="info">
       <h3>${esc(p.nombre)}</h3>
       ${p.detalle ? `<p class="detalle">${esc(p.detalle)}</p>` : ""}
+      ${p.consultarColor ? '<p class="colores">Consultá colores disponibles</p>' : ""}
       ${p.conAccesorios ? '<p class="incluye">Llega con vidrio templado, funda, cable y AirPods</p>' : ""}
       <p class="precio">${usd(p.usd)}</p>
       ${datos.dolar > 0 ? `<p class="pesos">${pesos(p.usd * datos.dolar)} al dólar de hoy</p>` : ""}
@@ -65,18 +66,23 @@ function pintar() {
 function sumar(id) {
   const p = datos.productos[id]; if (!p) return;
   const x = pedido.find(i => i.clave === p.clave);
-  if (x) x.cant++; else pedido.push({ clave: p.clave, nombre: p.nombre, condicion: p.condicion, detalle: p.detalle, usd: p.usd, imagen: p.imagen, cant: 1 });
+  if (x) x.cant++; else pedido.push({ clave: p.clave, nombre: p.nombre, condicion: p.condicion, detalle: p.detalle, consultarColor: p.consultarColor, usd: p.usd, imagen: p.imagen, cant: 1 });
   guardar(); pintar(); pintarPedido();
 }
 function cambiar(k, d) { const x = pedido.find(i => i.clave === k); if (!x) return; x.cant += d; pedido = pedido.filter(i => i.cant > 0); guardar(); pintar(); pintarPedido(); }
 
 function mensaje() {
-  const lineas = pedido.map(x => `· ${[x.nombre, x.condicion, x.detalle].filter(Boolean).join(" · ")}${x.cant > 1 ? ` × ${x.cant}` : ""}\n  ${usd(x.usd * x.cant)}`);
   const total = pedido.reduce((a, x) => a + x.usd * x.cant, 0);
   const envio = $("#envio").value.trim(), nombre = $("#nombre").value.trim();
-  return [nombre ? `Hola, soy ${nombre}. Quiero pedir:` : "Hola, quiero pedir:", ...lineas, "",
-    `Total: ${usd(total)}${datos.dolar > 0 ? ` · ${pesos(total * datos.dolar)} al dólar de hoy` : ""}`,
-    `Pago: ${$("#pago").value.toLowerCase()}`, `Envío a: ${envio || "a confirmar"}`].join("\n");
+  const items = pedido.map((x, i) => [
+    `${i + 1}) *${x.nombre}*${x.cant > 1 ? ` × ${x.cant}` : ""}`,
+    [x.detalle, x.condicion].filter(Boolean).length ? `   ${[x.detalle, x.condicion].filter(Boolean).join(" · ")}` : "",
+    x.consultarColor ? "   Color: a consultar" : "",
+    `   ${usd(x.usd * x.cant)}`].filter(Boolean).join("\n"));
+  return [`¡Hola Venta Store! ${nombre ? `Soy ${nombre}. ` : ""}Quiero hacer este pedido:`, "", ...items, "",
+    `*Total: ${usd(total)}*${datos.dolar > 0 ? ` (${pesos(total * datos.dolar)} al dólar de hoy)` : ""}`,
+    `Pago: ${$("#pago").value}`, `Envío: ${envio || "a confirmar"}`, "",
+    "¿Me confirman disponibilidad? ¡Gracias!"].join("\n");
 }
 
 function pintarPedido() {

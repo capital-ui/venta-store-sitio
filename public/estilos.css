@@ -83,6 +83,7 @@ p { margin: 0; }
 .info { padding: 16px 18px 18px; display: flex; flex-direction: column; gap: 4px; flex: 1; }
 .info h3 { font-size: 22px; }
 .detalle { font-size: 13.5px; font-weight: 600; color: var(--piedra); }
+.colores { font-size: 13px; font-weight: 600; color: var(--tierra-osc); margin-top: 2px; }
 .incluye { font-size: 14px; color: var(--selva); margin-top: 4px; }
 .precio { font-family: var(--titulo); font-weight: 800; font-size: 32px; letter-spacing: -.02em; margin-top: 10px; font-variant-numeric: tabular-nums; }
 .pesos { font-size: 14px; color: var(--piedra); font-variant-numeric: tabular-nums; }

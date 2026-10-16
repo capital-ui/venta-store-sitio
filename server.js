@@ -120,7 +120,8 @@ function prolijo(p) {
   if (col) detalle.push(col[1]);
   if (pulgadas) nombre = nombre.replace(/\s1\d$/, "") + " " + pulgadas;
   const categoria = /airtag|airpods/i.test(nombre) ? "accesorios" : CATEGORIAS[p.categoria] || "otros";
-  return { nombre, detalle: detalle.join(" · "), condicion, categoria, usd: p.usd, imagen: fotoDe(nombre, col && col[2]) || p.imagen, conAccesorios: categoria === "iphone" };
+  return { nombre, detalle: detalle.join(" · "), condicion, categoria, usd: p.usd, imagen: fotoDe(nombre, col && col[2]) || p.imagen, conAccesorios: categoria === "iphone",
+    consultarColor: !col && ["iphone", "ipad", "mac", "watch"].includes(categoria) };
 }
 
 async function catalogo() {
