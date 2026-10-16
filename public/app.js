@@ -242,8 +242,10 @@ const USADO_BATERIA_MEDIA = 15, USADO_BATERIA_BAJA = 30, USADO_DETALLES = 30, US
       `Funciona todo: ${si(chk.funciona)} · Face ID: ${si(chk.faceid)}`, `Nunca reparado: ${si(chk.original)} · Sin iCloud: ${si(chk.icloud)} · Caja: ${si(chk.caja)}`,
       r.v ? `Valor estimado en el sitio: ${usd(r.v)}` : null, "", "¿Qué equipo me puedo llevar?"].filter(l => l !== null).join("\n");
     enviar.href = `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(texto)}`;
-    enviar.textContent = r.v ? "Quiero entregarlo" : "Cotizar mi usado";
+    enviar.textContent = r.v ? "Quiero entregarlo" : mod.value ? "Consultar por WhatsApp" : "Elegí tu modelo";
   };
+  // Sin modelo elegido, el botón lleva al formulario en vez de abrir WhatsApp
+  enviar.addEventListener("click", e => { if (!mod.value) { e.preventDefault(); mod.focus(); mod.scrollIntoView({ block: "center", behavior: "smooth" }); } });
   mod.addEventListener("change", () => { capacidades(); calcular(); });
   [cap, est, ...Object.values(chk)].forEach(e => e.addEventListener("change", calcular)); bat.addEventListener("input", calcular);
   capacidades(); calcular();
