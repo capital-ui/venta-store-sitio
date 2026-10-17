@@ -292,3 +292,27 @@ details p { padding: 0 20px 18px; color: var(--piedra); }
 .ver-mas-fila { display: flex; justify-content: center; margin-top: 18px; }
 .ver-mas-fila .btn { min-width: 240px; }
 @media (max-width: 520px) { .tarjeta .incluye { display: none; } .ver-mas-fila .btn { width: 100%; } }
+/* Celular más corto: tarjetas compactas, pilares 2×2, simulador y cotizador plegados */
+.solo-cel { display: none; }
+@media (max-width: 520px) {
+  .solo-desk { display: none; }
+  .solo-cel { display: inline-flex; }
+  .abrir-sec { width: 100%; margin-top: 18px; }
+  .tarjeta .envio-gratis { display: none; }
+  .tarjeta .colores { font-size: 12px; }
+  .tarjeta .pesos { font-size: 13px; }
+  .tarjeta .efectivo { font-size: 13px; }
+  .pilares { grid-template-columns: 1fr 1fr; gap: 8px; }
+  .pilares li { padding: 12px 12px 14px; border-radius: 16px; }
+  .pilares b { font-size: 16px; }
+  .pilares b::before { width: 8px; height: 8px; margin-right: 6px; }
+  .pilares span { font-size: 12.5px; line-height: 1.35; }
+  .pasos { padding: 28px 0 36px; }
+  .pasos ol { gap: 10px; margin-top: 16px; }
+  .pasos li { padding: 14px 16px; display: grid; grid-template-columns: 34px 1fr; column-gap: 12px; align-items: start; }
+  .pasos li::before { width: 30px; height: 30px; font-size: 15px; margin: 0; grid-row: span 2; }
+  .pasos b { font-size: 17px; }
+  .usados:not(.abierta) .cot, .invertir:not(.abierta) .sim { display: none; }
+  .invertir .respaldo { display: none; }
+  .invertir.abierta .respaldo { display: grid; }
+}

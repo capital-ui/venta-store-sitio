@@ -56,13 +56,13 @@ function tarjeta(p) {
     <div class="info">
       <h3>${esc(p.nombre)}</h3>
       ${p.detalle ? `<p class="detalle">${esc(p.detalle)}</p>` : ""}
-      ${p.consultarColor ? '<p class="colores">Consultá colores disponibles</p>' : ""}
+      ${p.consultarColor ? '<p class="colores">Consultá colores<span class="solo-desk"> disponibles</span></p>' : ""}
       ${p.conAccesorios ? '<p class="incluye">Llega con vidrio templado, funda, cable y auriculares de regalo</p>' : ""}
       <p class="precio">${usd(p.usd)}</p>
       ${sellado(p) ? `<p class="efectivo">${usd(p.usd - DESC_EFECTIVO)} en efectivo</p>` : ""}
-      ${datos.dolar > 0 ? `<p class="pesos">${pesos(p.usd * datos.dolar)} al dólar de hoy</p>` : ""}
+      ${datos.dolar > 0 ? `<p class="pesos">${pesos(p.usd * datos.dolar)}<span class="solo-desk"> al dólar de hoy</span></p>` : ""}
       <p class="envio-gratis">Envío gratis a todo el país</p>
-      <p class="cuota-nota"><a href="${enlaceCuotas(p)}" target="_blank" rel="noopener">o en cuotas sin tarjeta, en Posadas ›</a></p>
+      <p class="cuota-nota"><a href="${enlaceCuotas(p)}" target="_blank" rel="noopener"><span class="solo-desk">o en cuotas sin tarjeta, en Posadas</span><span class="solo-cel">Cuotas sin tarjeta</span> ›</a></p>
       <button class="btn pri${enPedido ? " sumado" : ""}" type="button" data-sumar="${p.id}">${enPedido ? `En el pedido (${enPedido.cant})` : "Sumar al pedido"}</button>
     </div></article>`;
 }
@@ -287,3 +287,10 @@ const USADO_BATERIA_MEDIA = 15, USADO_BATERIA_BAJA = 30, USADO_DETALLES = 30, US
   [cap, est, llevar, ...Object.values(chk)].forEach(e => e.addEventListener("change", calcular)); bat.addEventListener("input", calcular);
   capacidades(); calcular();
 })();
+
+/* ---------- En el celular, el simulador y el cotizador se abren con un botón ---------- */
+document.querySelectorAll("[data-abrir-seccion]").forEach(b => b.addEventListener("click", () => {
+  const sec = document.getElementById(b.dataset.abrirSeccion); sec.classList.add("abierta"); b.hidden = true;
+}));
+// Los enlaces a #usados (botón de la caja roja, menú) abren el cotizador
+document.querySelectorAll('a[href="#usados"]').forEach(a => a.addEventListener("click", () => { $("#usados").classList.add("abierta"); const b = $('[data-abrir-seccion="usados"]'); if (b) b.hidden = true; }));
