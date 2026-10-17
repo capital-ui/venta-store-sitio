@@ -67,11 +67,18 @@ function tarjeta(p) {
     </div></article>`;
 }
 
+// Se muestran unos pocos equipos y un botón para ver el resto (en el celular la página quedaba muy larga)
+const CUANTOS = () => (innerWidth <= 520 ? 8 : 12);
+let mostrar = CUANTOS(), vistaAnterior = "";
 function pintar() {
+  const vista = [filtro, condicion, texto].join("|");
+  if (vista !== vistaAnterior) { mostrar = CUANTOS(); vistaAnterior = vista; }
   const q = texto.trim().toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "");
   const lista = datos.productos.filter(p => (filtro === "todos" || p.categoria === filtro) && (!condicion || p.condicion === condicion)
     && (!q || [p.nombre, p.detalle, p.condicion].join(" ").toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").includes(q)));
-  $("#grilla").innerHTML = lista.length ? lista.map(tarjeta).join("") : `<p class="sin-resultados">No encontramos “${esc(texto)}”. Escribinos por WhatsApp: si no está publicado, lo conseguimos.</p>`;
+  $("#grilla").innerHTML = lista.length ? lista.slice(0, mostrar).map(tarjeta).join("") : `<p class="sin-resultados">No encontramos “${esc(texto)}”. Escribinos por WhatsApp: si no está publicado, lo conseguimos.</p>`;
+  const resto = lista.length - mostrar, ver = $("#verMas");
+  ver.hidden = resto <= 0; ver.textContent = `Ver más equipos (${resto})`;
 }
 
 /* ---------- Pedido ---------- */
@@ -144,6 +151,7 @@ document.addEventListener("click", ev => {
   else if (t.hasAttribute("data-abrir-pedido")) abrir(true);
   else abrir(false);
 });
+$("#verMas").addEventListener("click", () => { mostrar = Infinity; pintar(); });
 document.addEventListener("keydown", ev => { if (ev.key === "Escape" && $("#pedido").classList.contains("abierto")) abrir(false); });
 $("#buscar").addEventListener("input", ev => { texto = ev.target.value; pintar(); });
 ["#envio", "#nombre"].forEach(s => $(s).addEventListener("input", actualizarEnlace));
