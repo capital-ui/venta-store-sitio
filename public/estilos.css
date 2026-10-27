@@ -316,3 +316,14 @@ details p { padding: 0 20px 18px; color: var(--piedra); }
   .invertir .respaldo { display: none; }
   .invertir.abierta .respaldo { display: grid; }
 }
+
+/* Asesores */
+.asesores { padding: 0 0 56px; }
+.asesores .sub { margin-top: 6px; }
+.asesores-fila { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-top: 20px; }
+.asesor { background: var(--blanco); border: 1px solid var(--linea); border-radius: 20px; padding: 20px 22px; display: grid; grid-template-columns: auto 1fr; align-items: center; gap: 14px 16px; }
+.asesor .inicial { width: 52px; height: 52px; border-radius: 16px; background: var(--tierra); color: var(--blanco); display: grid; place-items: center; font: 800 24px var(--titulo); }
+.asesor b { display: block; font-family: var(--titulo); font-size: 21px; }
+.asesor div span { display: block; color: var(--piedra); font-size: 15px; }
+.asesor .btn { grid-column: 1 / -1; justify-content: center; }
+@media (max-width: 640px) { .asesores-fila { grid-template-columns: 1fr; } }
