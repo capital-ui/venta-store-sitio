@@ -12,6 +12,35 @@ const miles = n => Math.round(n).toLocaleString("es-AR");
 const usd = n => miles(n) + " USD";
 const pesos = n => "$" + miles(n);
 
+/* ---------- Asesores: el cliente elige con quién habla (pedido, cuotas, usados) ---------- */
+const ASESORES = { alan: "5493764586667", lucas: "5493765049578" };
+let asesor = (() => { try { const a = localStorage.getItem("vs-asesor"); return ASESORES[a] ? a : ""; } catch { return ""; } })();
+let pendiente = "";
+const conAsesor = href => href.replace(/wa\.me\/\d+/, "wa.me/" + ASESORES[asesor]);
+function ponerAsesor(a) {
+  asesor = a; try { localStorage.setItem("vs-asesor", a); } catch {}
+  document.querySelectorAll("[data-asesor]").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.asesor === a)));
+}
+function ventanaAsesor(si) {
+  $("#asesorModal").hidden = !si;
+  if (si) setTimeout(() => $("[data-ir-asesor]").focus(), 30); else pendiente = "";
+}
+// Los enlaces de WhatsApp (salvo los fijos: tarjetas de asesores, pie e inversiones) van al asesor elegido; sin elegir, se pregunta
+document.addEventListener("click", ev => {
+  const a = ev.target.closest('a[href*="wa.me/"]:not([data-fijo])');
+  if (!a || a.getAttribute("aria-disabled") === "true") return;
+  if (!asesor) { ev.preventDefault(); pendiente = a.href; ventanaAsesor(true); return; }
+  a.href = conAsesor(a.href);
+}, true);
+document.addEventListener("click", ev => {
+  const b = ev.target.closest("[data-asesor],[data-ir-asesor],[data-cerrar-asesor],#asesorModal");
+  if (!b) return;
+  if (b.dataset.asesor) return ponerAsesor(b.dataset.asesor);
+  if (b.dataset.irAsesor) { ponerAsesor(b.dataset.irAsesor); const url = conAsesor(pendiente); ventanaAsesor(false); window.open(url, "_blank", "noopener"); return; }
+  if (b.hasAttribute("data-cerrar-asesor") || ev.target === b) ventanaAsesor(false);
+});
+document.addEventListener("keydown", ev => { if (ev.key === "Escape" && !$("#asesorModal").hidden) ventanaAsesor(false); });
+
 let datos = { dolar: 0, productos: [] }, filtro = "todos", condicion = "", texto = "";
 let pedido = leer();
 
@@ -197,6 +226,7 @@ document.querySelector(".sim-controles").addEventListener("click", ev => {
   sim[g] = g === "plazo" ? Number(b.dataset.valor) : b.dataset.valor; simular();
 });
 ponerMonto(sim.monto);
+ponerAsesor(asesor);
 iniciar();
 
 /* ---------- Cotizador de usados (sección #usados; valores de la pestaña "Usados" de la planilla) ----------

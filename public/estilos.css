@@ -327,3 +327,18 @@ details p { padding: 0 20px 18px; color: var(--piedra); }
 .asesor div span { display: block; color: var(--piedra); font-size: 15px; }
 .asesor .btn { grid-column: 1 / -1; justify-content: center; }
 @media (max-width: 640px) { .asesores-fila { grid-template-columns: 1fr; } }
+
+/* Elegir asesor */
+.elegir-asesor { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; margin-bottom: 12px; }
+.elegir-asesor > span { font-weight: 700; font-size: 15px; }
+.elegir-asesor div { display: flex; gap: 8px; }
+.elegir-asesor button { min-height: 40px; min-width: 84px; border: 1.5px solid var(--linea); border-radius: 99px; background: var(--blanco); color: var(--selva); font: 700 15px var(--texto); cursor: pointer; padding: 0 16px; }
+.elegir-asesor button[aria-pressed="true"] { background: var(--tierra); border-color: var(--tierra); color: var(--blanco); }
+.asesor-modal { position: fixed; inset: 0; z-index: 70; background: rgba(15, 31, 26, .55); display: grid; place-items: center; padding: 16px; }
+.asesor-modal[hidden] { display: none; }
+.asesor-caja { position: relative; background: var(--blanco); color: var(--selva); border-radius: 22px; padding: 26px 22px 22px; width: min(400px, 100%); text-align: center; }
+.asesor-caja h2 { font-size: 24px; padding: 0 24px; }
+.asesor-caja p { color: var(--piedra); margin-top: 6px; font-size: 15px; }
+.asesor-opciones { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 18px; }
+.asesor-opciones .btn { justify-content: center; }
+.asesor-caja .cerrar { position: absolute; top: 10px; right: 12px; color: var(--piedra); }

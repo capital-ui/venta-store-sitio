@@ -148,6 +148,7 @@
             <div class="cot-dif" id="uDif" aria-live="polite"></div>
           </div>
           <p class="cot-nota">Valor estimado, sujeto a revisión del equipo en persona. Lo descontamos del precio del equipo que te llevás.</p>
+          <div class="elegir-asesor" role="group" aria-label="Elegí tu asesor"><span>¿Con quién querés hablar?</span><div><button type="button" data-asesor="alan" aria-pressed="false">Alan</button><button type="button" data-asesor="lucas" aria-pressed="false">Lucas</button></div></div>
           <a class="btn pri" id="uEnviar" href="#" target="_blank" rel="noopener">Elegí tu modelo</a>
         </div>
       </div>
@@ -172,8 +173,8 @@
       <h2 id="tAsesores">Tus asesores</h2>
       <p class="sub">Te atiende una persona, no un bot. Escribile al que prefieras, de lunes a sábado de 9 a 18.</p>
       <div class="asesores-fila">
-        <div class="asesor"><span class="inicial" aria-hidden="true">A</span><div><b>Alan</b><span>Asesor · Venta Store</span></div><a class="btn pri" href="https://wa.me/5493764586667?text=%C2%A1Hola%20Alan%21%20Te%20escribo%20desde%20ventastore.store." target="_blank" rel="noopener">Escribile por WhatsApp</a></div>
-        <div class="asesor"><span class="inicial" aria-hidden="true">L</span><div><b>Lucas</b><span>Asesor · Venta Store</span></div><a class="btn pri" href="https://wa.me/5493765049578?text=%C2%A1Hola%20Lucas%21%20Te%20escribo%20desde%20ventastore.store." target="_blank" rel="noopener">Escribile por WhatsApp</a></div>
+        <div class="asesor"><span class="inicial" aria-hidden="true">A</span><div><b>Alan</b><span>Asesor · Venta Store</span></div><a class="btn pri" data-fijo href="https://wa.me/5493764586667?text=%C2%A1Hola%20Alan%21%20Te%20escribo%20desde%20ventastore.store." target="_blank" rel="noopener">Escribile por WhatsApp</a></div>
+        <div class="asesor"><span class="inicial" aria-hidden="true">L</span><div><b>Lucas</b><span>Asesor · Venta Store</span></div><a class="btn pri" data-fijo href="https://wa.me/5493765049578?text=%C2%A1Hola%20Lucas%21%20Te%20escribo%20desde%20ventastore.store." target="_blank" rel="noopener">Escribile por WhatsApp</a></div>
       </div>
     </div>
   </section>
@@ -208,7 +209,7 @@
           <div class="grafico" id="simGrafico" aria-hidden="true"></div>
           <div class="grafico-ref"><span><i class="ref-cap"></i>Tu capital</span><span><i class="ref-gan"></i>Ganancia acumulada</span></div>
           <p class="sim-error" id="simError" hidden></p>
-          <a class="btn pri" id="simWa" href="#" target="_blank" rel="noopener">Quiero invertir</a>
+          <a class="btn pri" id="simWa" data-fijo href="#" target="_blank" rel="noopener">Quiero invertir</a>
         </div>
       </div>
       <ul class="respaldo">
@@ -232,14 +233,24 @@
     </div>
     <dl>
       <div><dt>Horario</dt><dd>Lunes a sábado de 9 a 18</dd></div>
-      <div><dt>WhatsApp Alan</dt><dd><a href="https://wa.me/5493764586667" target="_blank" rel="noopener">+54 9 3764 58-6667</a></dd></div>
-      <div><dt>WhatsApp Lucas</dt><dd><a href="https://wa.me/5493765049578" target="_blank" rel="noopener">+54 9 3765 04-9578</a></dd></div>
+      <div><dt>WhatsApp Alan</dt><dd><a data-fijo href="https://wa.me/5493764586667" target="_blank" rel="noopener">+54 9 3764 58-6667</a></dd></div>
+      <div><dt>WhatsApp Lucas</dt><dd><a data-fijo href="https://wa.me/5493765049578" target="_blank" rel="noopener">+54 9 3765 04-9578</a></dd></div>
       <div><dt>Instagram</dt><dd><a href="https://www.instagram.com/_ventastore_/" target="_blank" rel="noopener">@_ventastore_</a></dd></div>
       <div><dt>Correo</dt><dd><a href="mailto:capital@ventastore.store">capital@ventastore.store</a></dd></div>
     </dl>
   </div>
   <p class="ancho legal">Los precios en pesos se calculan al dólar del día y pueden cambiar. Las fotos son ilustrativas.</p>
 </footer>
+
+<!-- Elegir asesor -->
+<div class="asesor-modal" id="asesorModal" hidden>
+  <div class="asesor-caja" role="dialog" aria-modal="true" aria-labelledby="tElegir">
+    <h2 id="tElegir">¿Con quién querés hablar?</h2>
+    <p>Los dos te atienden por WhatsApp, de lunes a sábado de 9 a 18.</p>
+    <div class="asesor-opciones"><button type="button" class="btn pri" data-ir-asesor="alan">Alan</button><button type="button" class="btn pri" data-ir-asesor="lucas">Lucas</button></div>
+    <button type="button" class="cerrar" data-cerrar-asesor aria-label="Cerrar">×</button>
+  </div>
+</div>
 
 <!-- Pedido -->
 <div class="fondo" id="fondo" hidden></div>
@@ -255,7 +266,7 @@
       <label>Tu nombre (opcional)<input id="nombre" type="text" autocomplete="name"></label>
     </div>
   </div>
-  <div class="pedido-pie"><a class="btn wa" id="enviar" href="#" target="_blank" rel="noopener" aria-disabled="true">Enviar pedido por WhatsApp</a></div>
+  <div class="pedido-pie"><div class="elegir-asesor" role="group" aria-label="Elegí tu asesor"><span>¿Con quién querés hablar?</span><div><button type="button" data-asesor="alan" aria-pressed="false">Alan</button><button type="button" data-asesor="lucas" aria-pressed="false">Lucas</button></div></div><a class="btn wa" id="enviar" href="#" target="_blank" rel="noopener" aria-disabled="true">Enviar pedido por WhatsApp</a></div>
 </aside>
 <button class="barra-pedido" id="barraPedido" type="button" data-abrir-pedido hidden></button>
 
